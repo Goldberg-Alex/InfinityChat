@@ -10,7 +10,7 @@ class User {
 public:
     explicit User(int fd);
 
-    void set_name();
+    void set_name(const std::string& name);
     int get_fd() const;
     std::string& get_name() const;
 
