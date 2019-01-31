@@ -16,7 +16,7 @@ int User::get_fd() const
     return m_fd;
 }
 
-std::string& get_name() const
+const std::string& User::get_name() const
 {
     return m_name;
 }

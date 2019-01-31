@@ -13,5 +13,5 @@ core
 *.vscode
 ~*
 *.plist
+*depend*
 #and so on
-

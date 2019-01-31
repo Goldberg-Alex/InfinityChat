@@ -10,47 +10,74 @@ CPPCHECK = cppcheck
 CPPCHECKFLAGS = --enable=all --suppress=missingInclude --quiet --verbose 
 RM = rm -f
 
+TEST_DIR = ./tests/
 SRC_DIR = ./src/
+SRC_TEST_DIR = ./src/tests
+
 HEADERS = ./include/
 OBJ_DIR = ./obj/
+
 DEPEND_DIR = ./depend/
 
 # SUBDIRS := $(shell ls -F | grep "\/" )
 # DIRS := ./ $(SUBDIRS)
 
-SRC := $(filter-out %_test.cpp, $(foreach d, $(SRC_DIR), $(wildcard $(d)*.cpp)))
-OBJ = $(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
+# SRC = client.cpp command.cpp epoll.cpp semaphore.cpp server.cpp socket.cpp user_list.cpp user.cpp 
+
 HDR = $(wildcard $(HEADERS)*.hpp)
+
+SRC := $(filter-out %_test.cpp, $(foreach d, $(SRC_DIR), $(wildcard $(d)*.cpp)))
+# TEST_SRC:=$(filter %_test.cpp, $(foreach d, $(SRC_DIR), $(wildcard $(d)*.cpp)))
+
+OBJ = $(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
+# TEST_OBJ = $(patsubst $(SRC_TEST_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
+
 DEPENDENCIES = $(patsubst $(SRC_DIR)%.cpp, $(DEPEND_DIR)%.d, $(SRC))
 
 #compile, static check, link and test
 .PHONY: all
-all:  $(PROJECT) $(DEPENDENCIES)
+# all:  $(SERVER) $(CLIENT) $(DEPENDENCIES)
+all: $(CLIENT) $(SERVER)
+# .PHONY: test
+# test: all
+# 	@echo "---------------Testing-----------------"
+# #	sudo $(VLG) $(VLGFLAGS) ./$(PROJECT)
+# 	sudo ./$(PROJECT)
 
-.PHONY: test
-test: all
-	@echo "---------------Testing-----------------"
-#	sudo $(VLG) $(VLGFLAGS) ./$(PROJECT)
-	sudo ./$(PROJECT)
+# 	@echo "------------Testing Done---------------"
 
-	@echo "------------Testing Done---------------"
 
-$(PROJECT) : $(OBJ)
+$(CLIENT) : $(OBJ)
 	echo "---------------Checking----------------"
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
 
 	echo "---------------Linking-----------------"
-	$(CXX) $(CXXFLAGS)  -o $(PROJECT) $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o, $(OBJ))
+
+
+$(SERVER) : $(OBJ)
+	echo "---------------Checking----------------"
+	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
+
+	echo "---------------Linking-----------------"
+	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)client.o, $(OBJ))
+
+# $(TEST_DIR)%.out :  $(OBJ_DIR)%.o
+
+	echo "---------------Checking----------------"
+	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
+
+	echo "---------------Linking-----------------"
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJ)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	echo "--------------Compiling----------------"
-	$(CXX) $(CXXFLAGS) -c  $(SRC_DIR)$*.cpp -o $@
+	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)$*.cpp -o $@
 	# mv $@ $(OBJ_DIR)
 
 # Create .d files
 $(DEPEND_DIR)%.d:  $(SRC_DIR)%.cpp
-	$(CXX) $(DEPENDENCY_OPTIONS) $< -MT "$(OBJ_DIR)$*.o $(DEPEND_DIR)$*.d"
-
+	$(CXX) $(DEPENDENCY_OPTIONS) $< -MT "$(OBJ_DIR)$*.o $*.d" -MF $(DEPEND_DIR)$*.d
 
 # Include dependencies (if there are any)
 ifneq "$(strip $(DEPENDENCIES))" ""

@@ -12,7 +12,7 @@ public:
 
     void set_name(const std::string& name);
     int get_fd() const;
-    std::string& get_name() const;
+    const std::string& get_name() const;
 
 private:
     const int m_fd;

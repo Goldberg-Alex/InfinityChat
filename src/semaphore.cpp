@@ -6,8 +6,7 @@
 //-----------------------------------------
 
 // A wrapper to a posix semaphore providing RAII.
-
-#include "code_utils.hpp"
+#include <stdexcept>//std::runtime_error
 
 #include "semaphore.hpp"
 
@@ -31,6 +30,7 @@ void Semaphore::post()
 {
     sem_post(&m_sem);
 }
+
 void Semaphore::wait()
 {
     sem_wait(&m_sem);

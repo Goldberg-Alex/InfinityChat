@@ -5,8 +5,6 @@
 
 #include <semaphore.h> //semaphore
 
-#include "code_utils.hpp"
-
 //------------------------------------------------------------------------------
 
 namespace ilrd {

@@ -7,8 +7,6 @@
 #include <sys/epoll.h> //epoll
 #include <vector>      //vector
 
-#include "code_utils.hpp"
-
 //------------------------------------------------------------------------------
 
 namespace ilrd {
