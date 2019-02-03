@@ -12,71 +12,70 @@ RM = rm -f
 
 TEST_DIR = ./tests/
 SRC_DIR = ./src/
-SRC_TEST_DIR = ./src/tests
+SRC_TEST_DIR = ./src/tests/
 
 HEADERS = ./include/
 OBJ_DIR = ./obj/
 
 DEPEND_DIR = ./depend/
 
-# SUBDIRS := $(shell ls -F | grep "\/" )
-# DIRS := ./ $(SUBDIRS)
-
-# SRC = client.cpp command.cpp epoll.cpp semaphore.cpp server.cpp socket.cpp user_list.cpp user.cpp 
-
 HDR = $(wildcard $(HEADERS)*.hpp)
 
 SRC := $(filter-out %_test.cpp, $(foreach d, $(SRC_DIR), $(wildcard $(d)*.cpp)))
-# TEST_SRC:=$(filter %_test.cpp, $(foreach d, $(SRC_DIR), $(wildcard $(d)*.cpp)))
+
+TEST_SRC:=$(wildcard $(SRC_TEST_DIR)*.cpp)
 
 OBJ = $(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
-# TEST_OBJ = $(patsubst $(SRC_TEST_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
+TEST_OBJ = $(patsubst $(SRC_TEST_DIR)%.cpp, $(OBJ_DIR)%.o, $(TEST_SRC))
+
+TEST_EXEC = $(patsubst $(OBJ_DIR)%_test.o, $(TEST_DIR)%_test.out, $(TEST_OBJ))
 
 DEPENDENCIES = $(patsubst $(SRC_DIR)%.cpp, $(DEPEND_DIR)%.d, $(SRC))
 
-#compile, static check, link and test
 .PHONY: all
-# all:  $(SERVER) $(CLIENT) $(DEPENDENCIES)
-all: $(CLIENT) $(SERVER)
-# .PHONY: test
-# test: all
-# 	@echo "---------------Testing-----------------"
-# #	sudo $(VLG) $(VLGFLAGS) ./$(PROJECT)
-# 	sudo ./$(PROJECT)
+all: $(CLIENT) $(SERVER) 
 
-# 	@echo "------------Testing Done---------------"
+.PHONY: test 
+test: all $(TEST_OBJ) $(TEST_EXEC) 
+	
+.PHONY: print 
+print:
+	@echo $(TEST_EXEC)
+	@echo $(TEST_OBJ)
 
+$(TEST_DIR)%_test.out : $(OBJ_DIR)%.o $(OBJ_DIR)%_test.o
+
+	@echo "---------------Checking----------------"
+	$(CPPCHECK) $(CPPCHECKFLAGS) $(TEST_SRC)
+
+	@echo "---------------Linking-----------------"
+	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o $(OBJ_DIR)client.o, $(OBJ)) $(OBJ_DIR)$*_test.o 
+
+	@echo "---------------Testing-----------------"
+	$(VLG) $(VLGFLAGS) ./$@
+
+	@echo "------------Testing Done---------------"
 
 $(CLIENT) : $(OBJ)
-	echo "---------------Checking----------------"
+	@echo "---------------Checking----------------"
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
 
-	echo "---------------Linking-----------------"
+	@echo "---------------Linking-----------------"
 	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o, $(OBJ))
 
-
 $(SERVER) : $(OBJ)
-	echo "---------------Checking----------------"
+	@echo "---------------Checking----------------"
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
-
-	echo "---------------Linking-----------------"
+	
+	@echo "---------------Linking-----------------"
 	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)client.o, $(OBJ))
 
-# $(TEST_DIR)%.out :  $(OBJ_DIR)%.o
-
-	echo "---------------Checking----------------"
-	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
-
-	echo "---------------Linking-----------------"
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJ)
-
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
-	echo "--------------Compiling----------------"
+	@echo "--------------Compiling----------------"
 	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)$*.cpp -o $@
-	# mv $@ $(OBJ_DIR)
 
 # Create .d files
-$(DEPEND_DIR)%.d:  $(SRC_DIR)%.cpp
+$(DEPEND_DIR)%.d: $(SRC_DIR)%.cpp
 	$(CXX) $(DEPENDENCY_OPTIONS) $< -MT "$(OBJ_DIR)$*.o $*.d" -MF $(DEPEND_DIR)$*.d
 
 # Include dependencies (if there are any)
@@ -86,8 +85,9 @@ endif
 
 .PHONY: clean
 clean :
-	$(RM) $(PROJECT) 
-	$(RM) $(OBJ)
+	$(RM) *.out 
+	$(RM) $(OBJ_DIR)*
+	$(RM) $(TEST_DIR)*
 	$(RM) vgcore.*	
 	$(RM) core
 
