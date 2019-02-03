@@ -17,8 +17,8 @@ class UserList {
     void insert(User&& user_);
     void remove(int fd);
 
-    std::map::iterator begin();
-    std::map::iterator end();
+    std::map<const int, User>::iterator begin();
+    std::map<const int, User>::iterator end();
 
     User& find(const std::string& name);
     User& find(int fd);
