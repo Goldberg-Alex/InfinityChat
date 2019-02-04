@@ -7,7 +7,6 @@
 
 // A testing for for a posix semaphore wrapper
 
-#include "code_utils.hpp"
 
 #include "semaphore.hpp"
 //------------------------------------------------------------------------------

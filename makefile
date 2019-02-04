@@ -10,14 +10,14 @@ CPPCHECK = cppcheck
 CPPCHECKFLAGS = --enable=all --suppress=missingInclude --quiet --verbose 
 RM = rm -f
 
-TEST_DIR = ./tests/
-SRC_DIR = ./src/
-SRC_TEST_DIR = ./src/tests/
+TEST_DIR = tests/
+SRC_DIR = src/
+SRC_TEST_DIR = src/tests/
 
-HEADERS = ./include/
-OBJ_DIR = ./obj/
+HEADERS = include/
+OBJ_DIR = obj/
 
-DEPEND_DIR = ./depend/
+DEPEND_DIR = depend/
 
 HDR = $(wildcard $(HEADERS)*.hpp)
 
@@ -36,20 +36,19 @@ DEPENDENCIES = $(patsubst $(SRC_DIR)%.cpp, $(DEPEND_DIR)%.d, $(SRC))
 all: $(CLIENT) $(SERVER) 
 
 .PHONY: test 
-test: all $(TEST_OBJ) $(TEST_EXEC) 
-	
+test: all $(TEST_EXEC) 
+
 .PHONY: print 
 print:
 	@echo $(TEST_EXEC)
 	@echo $(TEST_OBJ)
 
-$(TEST_DIR)%_test.out : $(OBJ_DIR)%.o $(OBJ_DIR)%_test.o
-
+$(TEST_EXEC) : $(TEST_OBJ)
 	@echo "---------------Checking----------------"
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(TEST_SRC)
 
 	@echo "---------------Linking-----------------"
-	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o $(OBJ_DIR)client.o, $(OBJ)) $(OBJ_DIR)$*_test.o 
+	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o $(OBJ_DIR)client.o, $(OBJ)) $< 
 
 	@echo "---------------Testing-----------------"
 	$(VLG) $(VLGFLAGS) ./$@
@@ -70,9 +69,13 @@ $(SERVER) : $(OBJ)
 	@echo "---------------Linking-----------------"
 	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)client.o, $(OBJ))
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
+$(OBJ_DIR)%.o : $(SRC_DIR)%.cpp
 	@echo "--------------Compiling----------------"
 	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)$*.cpp -o $@
+
+$(TEST_OBJ) : $(TEST_SRC)
+	@echo "--------------Compiling----------------"
+	$(CXX) $(CXXFLAGS) -c $(SRC_TEST_DIR)$(<F) -o $@
 
 # Create .d files
 $(DEPEND_DIR)%.d: $(SRC_DIR)%.cpp
@@ -88,74 +91,6 @@ clean :
 	$(RM) *.out 
 	$(RM) $(OBJ_DIR)*
 	$(RM) $(TEST_DIR)*
+	$(RM) $(DEPEND_DIR)*
 	$(RM) vgcore.*	
 	$(RM) core
-
-
-# #-- reference--------------------
-# # Project Name (executable)
-# PROJECT = demoproject
-# # Compiler
-# CC = g++
-
-# # Run Options       
-# COMMANDLINE_OPTIONS = /dev/ttyS0
-
-# # Compiler options during compilation
-# COMPILE_OPTIONS = -ansi -pedantic -Wall
-
-# #Header include directories
-# HEADERS =
-# #Libraries for linking
-# LIBS =
-
-# # Dependency options
-# DEPENDENCY_OPTIONS = -MM
-
-# #-- Do not edit below this line --
-
-# # Subdirs to search for additional source files
-# SUBDIRS := $(shell ls -F | grep "\/" )
-# DIRS := ./ $(SUBDIRS)
-# SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
-
-# # Create an object file of every cpp file
-# OBJECTS = $(patsubst %.cpp, %.o, $(SOURCE_FILES))
-
-# # Dependencies
-# DEPENDENCIES = $(patsubst %.cpp, %.d, $(SOURCE_FILES))
-
-# # Create .d files
-# %.d: %.cpp
-#     $(CC) $(DEPENDENCY_OPTIONS) $< -MT "$*.o $*.d" -MF $*.d
-
-# # Make $(PROJECT) the default target
-# all: $(DEPENDENCIES) $(PROJECT)
-
-# $(PROJECT): $(OBJECTS)
-#     $(CC) -o $(PROJECT) $(OBJECTS) $(LIBS)
-
-# # Include dependencies (if there are any)
-# ifneq "$(strip $(DEPENDENCIES))" ""
-#   include $(DEPENDENCIES)
-# endif
-
-# # Compile every cpp file to an object
-# %.o: %.cpp
-#     $(CC) -c $(COMPILE_OPTIONS) -o $@ $< $(HEADERS)
-
-# # Build & Run Project
-# run: $(PROJECT)
-#     ./$(PROJECT) $(COMMANDLINE_OPTIONS)
-
-# # Clean & Debug
-# .PHONY: makefile-debug
-# makefile-debug:
-
-# .PHONY: clean
-# clean:
-#     rm -f $(PROJECT) $(OBJECTS)
-
-# .PHONY: depclean
-# depclean:
-#     rm -f $(DEPENDENCIES)
