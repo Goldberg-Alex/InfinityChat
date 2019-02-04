@@ -15,18 +15,20 @@ namespace ilrd {
 
 class UserList {
 public:
+    using user_ptr = std::shared_ptr<User>;
     explicit UserList();
 
-    void insert(std::shared_ptr<User> user_);
+    void insert(user_ptr user_);
     void remove(int fd);
 
-    std::map<const int, User>::iterator begin();
-    std::map<const int, User>::iterator end();
+    std::map<const int, user_ptr >::iterator begin();
+    std::map<const int, user_ptr >::iterator end();
 
-    std::shared_ptr<User> find(const std::string& name);
-    std::shared_ptr<User> find(int fd);
+    // returns nullptr in failure
+    user_ptr find(const std::string& name);
+    user_ptr find(int fd);
 
-    void change_name(std::shared_ptr<User> user, const std::string& new_name);
+    void change_name(user_ptr user, const std::string& new_name);
 
     UserList(UserList&&) = default;
     UserList& operator=(UserList&&) = default;
@@ -35,8 +37,8 @@ public:
     UserList& operator=(UserList&) = delete;
 
 private:
-    std::map<const int, std::shared_ptr<User> > m_fd_to_user;
-    std::map<std::string, std::shared_ptr<User> > m_name_to_user;
+    std::map<const int, user_ptr > m_fd_to_user;
+    std::map<std::string, user_ptr > m_name_to_user;
 };
 
 } // namespace ilrd
