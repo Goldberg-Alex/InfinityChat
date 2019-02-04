@@ -1,4 +1,5 @@
 // Implementtion of the socket class used by both client and server
+//must receive an open socket. closes the socket on destruction
 
 // version 1.0
 
