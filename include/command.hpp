@@ -14,8 +14,8 @@ public:
     Command(User& user, std::string args);
     virtual ~Command();
 
-    const std::string& get_args();
-    const User& get_user();
+    const std::string& get_args() const;
+    const User& get_user() const;
     virtual void execute() = 0;
 
     Command(Command&&) = default;
@@ -34,6 +34,8 @@ public:
     ~Message() = default;
 
     void execute() override;
+
+    static std::unique_ptr<Command> creator(User& user, std::string msg);
 };
 
 class ChangeName : public Command {
@@ -42,6 +44,8 @@ public:
     ~ChangeName() = default;
 
     void execute() override;
+
+    static std::unique_ptr<Command> creator(User& user, std::string new_name);
 };
 
 class List : public Command {
@@ -50,6 +54,8 @@ public:
     ~List() = default;
 
     void execute() override;
+
+    static std::unique_ptr<Command> creator(User& user);
 };
 
 class Whisper : public Command {
@@ -58,6 +64,8 @@ public:
     ~Whisper() = default;
 
     void execute() override;
+
+    static std::unique_ptr<Command> creator(User& user, std::string name, std::string msg);
 
 private:
     std::string m_name;
