@@ -44,6 +44,7 @@ print:
 	@echo $(TEST_OBJ)
 
 $(TEST_EXEC) : $(TEST_OBJ)
+	@mkdir -p $(TEST_DIR)
 	@echo "---------------Checking----------------"
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(TEST_SRC)
 
@@ -70,15 +71,19 @@ $(SERVER) : $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)client.o, $(OBJ))
 
 $(OBJ_DIR)%.o : $(SRC_DIR)%.cpp
+	@mkdir -p $(OBJ_DIR)
 	@echo "--------------Compiling----------------"
 	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)$*.cpp -o $@
 
 $(TEST_OBJ) : $(TEST_SRC)
+	@mkdir -p $(OBJ_DIR)
+
 	@echo "--------------Compiling----------------"
 	$(CXX) $(CXXFLAGS) -c $(SRC_TEST_DIR)$(<F) -o $@
 
 # Create .d files
 $(DEPEND_DIR)%.d: $(SRC_DIR)%.cpp
+	@mkdir -p $(DEPEND_DIR)
 	$(CXX) $(DEPENDENCY_OPTIONS) $< -MT "$(OBJ_DIR)$*.o $*.d" -MF $(DEPEND_DIR)$*.d
 
 # Include dependencies (if there are any)

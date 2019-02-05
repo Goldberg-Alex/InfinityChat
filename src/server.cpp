@@ -11,6 +11,7 @@
 
 #include <netdb.h> //addrinfo
 
+#include "config.hpp"	
 #include "socket.hpp"
 //------------------------------------------------------------------------------
 namespace ilrd
@@ -20,10 +21,6 @@ namespace ilrd
 void init_server();
 int get_listen_socket();
 //------------------------------------------------------------------------------
-
-//the port number to listen for incoming connections
-const char tcp_listen_port[] = "10000";
-const int tcp_backlog_size = 100; //number of allowed pending requests
 
 int main()
 {

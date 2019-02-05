@@ -18,23 +18,24 @@ namespace ilrd
 {
 class Socket
 {
-  public:
-    //receives an open socket
-    explicit Socket(int fd);
-    Socket(Socket &&) = default;
-    Socket &operator=(Socket &&) = default;
+public:
+  //receives an open socket
+  explicit Socket(int fd);
+  Socket(Socket &&) = default;
+  Socket &operator=(Socket &&) = default;
 
-    ~Socket();
+  ~Socket();
 
-    void send(const std::string &message) const;
-    std::string &&receive() const;
+  void send(const std::string &message) const;
+  const std::string &receive() const;
 
-    Socket(const Socket &) = delete;
-    Socket &operator=(const Socket &) = delete;
+  int get_fd();
 
-  private:
-   
-    int m_fd;
+  Socket(const Socket &) = delete;
+  Socket &operator=(const Socket &) = delete;
+
+private:
+  int m_fd;
 };
 
 } // namespace ilrd

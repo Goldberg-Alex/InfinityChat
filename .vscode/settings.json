@@ -39,6 +39,7 @@
         "typeinfo": "cpp",
         "utility": "cpp",
         "deque": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "iomanip": "cpp"
     }
 }
