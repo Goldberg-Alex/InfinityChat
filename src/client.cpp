@@ -1,8 +1,8 @@
 //-----------------------------------------
 // Written by - 		Alex Goldberg
-// File Name-		
-// Code Reviewer -	
-// Review Date-		
+// File Name-
+// Code Reviewer -
+// Review Date-
 //-----------------------------------------
 
 // this is a template for a cpp program
@@ -11,8 +11,7 @@
 
 int main()
 {
-	
-	return (0);
+
+    return (0);
 }
 //------------------------------------------------------------------------------
-

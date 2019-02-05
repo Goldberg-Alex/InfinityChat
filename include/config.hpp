@@ -5,13 +5,11 @@
 // Review Date-
 //-----------------------------------------
 
-
 //common definitions and declarations for the project
 
 //the port number in the server to listen for incoming connections
 //and also the port number to connect to in the client
 const char tcp_listen_port[] = "10000";
 
-//number of allowed pending requests
-const int tcp_backlog_size = 100; 
-
+//number of allowed pending requests to the tcp socket we're listening to
+const int tcp_backlog_size = 100;

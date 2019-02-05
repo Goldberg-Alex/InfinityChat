@@ -87,15 +87,15 @@ $(DEPEND_DIR)%.d: $(SRC_DIR)%.cpp
 	$(CXX) $(DEPENDENCY_OPTIONS) $< -MT "$(OBJ_DIR)$*.o $*.d" -MF $(DEPEND_DIR)$*.d
 
 # Include dependencies (if there are any)
-ifneq "$(strip $(DEPENDENCIES))" ""
+# ifneq "$(strip $(DEPENDENCIES))" ""
 -include $(DEPENDENCIES)
-endif
+# endif
 
 .PHONY: clean
 clean :
 	$(RM) *.out 
-	$(RM) $(OBJ_DIR)*
-	$(RM) $(TEST_DIR)*
-	$(RM) $(DEPEND_DIR)*
+	$(RM) -r $(OBJ_DIR)
+	$(RM) -r $(TEST_DIR)
+	$(RM) -r $(DEPEND_DIR)
 	$(RM) vgcore.*	
 	$(RM) core

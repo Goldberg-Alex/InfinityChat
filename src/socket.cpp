@@ -7,34 +7,31 @@
 
 // Implementation of the Socket class
 
-#include <unistd.h>  //close(), read(), write()
-#include <stdexcept> //std::runtime_error
 #include <cstring>   //memset()
+#include <stdexcept> //std::runtime_error
+#include <unistd.h>  //close(), read(), write()
 
 #include "../include/socket.hpp"
 //------------------------------------------------------------------------------
-namespace ilrd
-{
+namespace ilrd {
 Socket::Socket(int fd) : m_fd(fd)
-{
-}
+{}
 
 Socket::~Socket()
 {
     close(m_fd);
 }
 
-void Socket::send(const std::string &message) const
+void Socket::send(const std::string& message) const
 {
     int written_bytes = write(m_fd, message.c_str(), message.size());
 
-    if (-1 == written_bytes)
-    {
+    if (-1 == written_bytes) {
         throw std::runtime_error("error writing to socket");
     }
 }
 
-std::string &&Socket::receive() const
+const std::string& Socket::receive() const
 {
     static const int BUFFER_SIZE = 1024;
     static char buffer[BUFFER_SIZE];
@@ -42,12 +39,10 @@ std::string &&Socket::receive() const
 
     int read_bytes;
 
-    do
-    {
+    do {
         memset(buffer, 0, BUFFER_SIZE);
         read_bytes = read(m_fd, buffer, BUFFER_SIZE);
-        if (-1 == read_bytes)
-        {
+        if (-1 == read_bytes) {
             throw std::runtime_error("error reading from socket");
         }
 
@@ -56,6 +51,11 @@ std::string &&Socket::receive() const
     } while (read_bytes == BUFFER_SIZE);
 
     return (std::move(result));
+}
+
+int Socket::get_fd() const
+{
+    return (m_fd);
 }
 //------------------------------------------------------------------------------
 

@@ -3,16 +3,19 @@
 #ifndef ILRD_USER_LIST_HPP
 #define ILRD_USER_LIST_HPP
 
+#include <memory> //std::unique_ptr
 #include <string> // string
 
 #include "user.hpp"
 
 namespace ilrd {
+
 class User;
+
 class Command {
 public:
     Command(User& user, std::string args);
-    virtual ~Command();
+    virtual ~Command() = default;
 
     const std::string& get_args() const;
     const User& get_user() const;
@@ -23,6 +26,7 @@ public:
 
     Command(const Command&) = delete;
     Command& operator=(Command&) = delete;
+
 protected:
     User& m_user;
     std::string m_args;
@@ -65,7 +69,8 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> creator(User& user, std::string name, std::string msg);
+    static std::unique_ptr<Command>
+    creator(User& user, std::string name, std::string msg);
 
 private:
     std::string m_name;

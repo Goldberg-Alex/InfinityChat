@@ -1,9 +1,17 @@
-#include <sstream> // stringstream
+//-----------------------------------------
+// Written by - 		Yevgeny
+// File Name-
+// Code Reviewer -
+// Review Date-
+//-----------------------------------------
 
-#include "../include/user.hpp"
+// TODO document
+
+#include "user.hpp"
 
 namespace ilrd {
-User::User(int fd) : m_fd(fd), m_name(std::to_string(fd))
+User::User(Socket&& sock)
+    : m_socket(std::move(sock)), m_name(std::to_string(m_socket.get_fd()))
 {}
 
 void User::set_name(const std::string& name)
@@ -11,14 +19,14 @@ void User::set_name(const std::string& name)
     m_name = name;
 }
 
-int User::get_fd() const 
+int User::get_fd() const
 {
-    return m_fd;
+    return (m_socket.get_fd());
 }
 
 const std::string& User::get_name() const
 {
-    return m_name;
+    return (m_name);
 }
 
 } // namespace ilrd
