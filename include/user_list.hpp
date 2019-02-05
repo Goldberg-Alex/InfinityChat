@@ -28,6 +28,7 @@ public:
     user_ptr find(const std::string& name);
     user_ptr find(int fd);
 
+    // NOTE: change name doesnt check if new name is correct
     void change_name(user_ptr user, const std::string& new_name);
 
     UserList(UserList&&) = default;
