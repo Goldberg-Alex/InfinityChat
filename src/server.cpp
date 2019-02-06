@@ -10,6 +10,7 @@
 
 #include "config.hpp"          //TCP_LISTEN_PORT
 #include "epoll.hpp"           //Epoll
+#include "logger.hpp"          //Logger
 #include "socket_listener.hpp" //SocketCreator
 
 //------------------------------------------------------------------------------
@@ -28,8 +29,12 @@ int main()
     epoll.add(listener.get_fd(), EPOLLIN);
 
     bool stop = false;
+    
+    LOG(INFO, "entering event loop.");
 
     while (!stop) {
+        stop = true;
+        break;
         int num_events = epoll.wait(0);
         for (int i = 0; i < num_events; i++) {
 

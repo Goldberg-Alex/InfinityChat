@@ -5,14 +5,13 @@
 // Review Date-
 //-----------------------------------------
 
-// TODO document!
+// this is the implementation of the command class and it's deriving classes.
+// each type of command has it's own class with it's own execute() command.
 
 //------------------------------------------------------------------------------
 
-#include <new> // std::bad_alloc
-
-#include "logger.hpp"
 #include "command.hpp"
+#include "logger.hpp"
 
 namespace ilrd {
 

@@ -58,10 +58,9 @@ static void print_result(T result,
                          int line,
                          const std::string message)
 {
-    std::cout << status << " received: " << result
-              << " expected: " << expected << " ["
-              << filename.substr(filename.find_last_of('/') + 1) << ":" << line
-              << "] - " << message << std ::endl;
+    std::cout << status << " received: " << result << " expected: " << expected
+              << " [" << filename.substr(filename.find_last_of('/') + 1) << ":"
+              << line << "] - " << message << std ::endl;
 }
 
 template <typename T>
