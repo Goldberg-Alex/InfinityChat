@@ -45,10 +45,8 @@ print:
 
 $(TEST_EXEC) : $(TEST_OBJ)
 	@mkdir -p $(TEST_DIR)
-	@echo "---------------Checking----------------"
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(TEST_SRC)
 
-	@echo "---------------Linking-----------------"
 		$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o $(OBJ_DIR)client.o, $(OBJ)) $(OBJ_DIR)$(@F:.out=.o)
 
 	@echo "---------------Testing-----------------"
@@ -57,28 +55,22 @@ $(TEST_EXEC) : $(TEST_OBJ)
 	@echo "------------Testing Done---------------"
 
 $(CLIENT) : $(OBJ)
-	@echo "---------------Checking----------------"
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
 
-	@echo "---------------Linking-----------------"
 	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o, $(OBJ))
 
 $(SERVER) : $(OBJ)
-	@echo "---------------Checking----------------"
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
 	
-	@echo "---------------Linking-----------------"
 	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)client.o, $(OBJ))
 
 $(OBJ_DIR)%.o : $(SRC_DIR)%.cpp
 	@mkdir -p $(OBJ_DIR)
-	@echo "--------------Compiling----------------"
 	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)$*.cpp -o $@
 
 $(TEST_OBJ) : $(TEST_SRC)
 	@mkdir -p $(OBJ_DIR)
 
-	@echo "--------------Compiling----------------"
 	$(CXX) $(CXXFLAGS) -c $(SRC_TEST_DIR)$(@F:.o=.cpp) -o $@
 
 # Create .d files

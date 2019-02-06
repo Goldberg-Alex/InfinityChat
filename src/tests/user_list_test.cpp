@@ -18,10 +18,13 @@ using namespace ilrd;
 int main()
 {
     int socket_fd(12);
-  
+
     std::shared_ptr<User> user(new User(Socket(socket_fd)));
-    check_equal(user->get_fd(), socket_fd + 1, __LINE__, true);
+    // (user->get_fd(), socket_fd + 1, __LINE__, true);
 
     user->set_name("name");
+
+    CHECK_EQUAL(user->get_name() == "name", true, true, "checking equal name");
+
     // check_equal(user->get_name(), "name", __LINE__);
 }

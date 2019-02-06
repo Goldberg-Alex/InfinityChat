@@ -51,32 +51,50 @@ static T Abs(T t)
 }
 
 template <typename T>
-static void print_result(T result, T expected, std::string status, int line,
+static void print_result(T result,
+                         T expected,
+                         std::string status,
+                         std::string filename,
+                         int line,
                          const std::string message)
 {
-    std::cout << status << "  received:  " << result
-              << "  expected:  " << expected << "  line: " << line << "  "
-              << message << std ::endl;
+    std::cout << status << " received: " << result
+              << " expected: " << expected << " ["
+              << filename.substr(filename.find_last_of('/') + 1) << ":" << line
+              << "] - " << message << std ::endl;
 }
 
 template <typename T>
-static void check_equal(T result, T expected, int line, bool verbose = false,
-                 std::string message = "")
+static void check_equal(T result,
+                        T expected,
+                        int line,
+                        std::string filename,
+                        bool verbose = false,
+                        std::string message = "")
 {
     if (result == expected) {
 
         if (verbose) {
-            print_result(result, expected, "success - equal - ", line, message);
+            print_result(result,
+                         expected,
+                         "SUCCESS - equal - ",
+                         filename,
+                         line,
+                         message);
         }
 
     } else {
-        print_result(result, expected, "FAILURE - equal - ", line, message);
+        print_result(
+            result, expected, "FAILURE - equal - ", filename, line, message);
     }
 }
 
 template <typename T>
-static void check_different(T result, T expected, int line, bool verbose = false,
-                     std::string message = "")
+static void check_different(T result,
+                            T expected,
+                            int line,
+                            bool verbose = false,
+                            std::string message = "")
 {
     if (result != expected) {
 
@@ -88,6 +106,14 @@ static void check_different(T result, T expected, int line, bool verbose = false
         print_result(result, expected, "FAILURE - diff - ", line, message);
     }
 }
+
+#define CHECK_EQUAL(result, expected, verbose, message)                        \
+    check_equal((result),                                                      \
+                (expected),                                                    \
+                __LINE__,                                                      \
+                __FILE__,                                                      \
+                (verbose),                                                     \
+                std::string(message));
 
 } // namespace ilrd
 #endif // HRD6_CODE_UTILS
