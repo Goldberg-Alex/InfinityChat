@@ -5,12 +5,13 @@
 // Review Date-
 //-----------------------------------------
 
-// TODO document!
+// this is the implementation of the command class and it's deriving classes.
+// each type of command has it's own class with it's own execute() command.
 
 //------------------------------------------------------------------------------
 
-#include "logger.hpp"
 #include "command.hpp"
+#include "logger.hpp"
 
 namespace ilrd {
 
@@ -33,10 +34,9 @@ Message::Message(User& user, std::string msg) : Command(user, msg)
 {}
 
 std::unique_ptr<Command> Message::creator(User& user, std::string msg)
-{
+{}
 
-}
-
-void Message::execute() {}
+void Message::execute()
+{}
 
 } // namespace ilrd

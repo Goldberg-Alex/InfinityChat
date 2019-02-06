@@ -41,10 +41,10 @@ void Logger::write(enum log_level log_lvl,
     ScopeLock<std::mutex> lock(m_mutex);
 
     // TODO maybe combine all these into a signle string and insert once?
-    m_stream << log_lvl_str << "| "
-             << std::put_time(std::localtime(&now), "%F %T") << " |MSG| "
-             << message << " |FILE| " << filename << " |LINE| " << line
-             << " |FUNC| " << function << std::endl;
+    m_stream << "["<<log_lvl_str << "] ["
+             << std::put_time(std::localtime(&now), "%F | %T") << "]"
+             << " [" << filename.substr(filename.find_last_of('/') + 1) << " : "
+             << line << " : " << function << "] " << message << std::endl;
 }
 
 Logger::Logger(std::string path, enum log_level log_lvl)

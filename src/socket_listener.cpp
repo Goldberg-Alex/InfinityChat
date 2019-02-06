@@ -24,7 +24,9 @@ Socket get_listen_socket(std::string port);
 
 SocketListener::SocketListener(std::string port)
     : m_listen_socket(get_listen_socket(port))
-{}
+{
+    LOG(INFO, "socket listener created");
+}
 
 //------------------------------------------------------------------------------
 Socket SocketListener::connect() const
@@ -39,7 +41,9 @@ Socket SocketListener::connect() const
                         &peer_addr_size);
 
     if (-1 == socket) {
-        throw std::runtime_error("error connecting socket");
+        std::string str("error connecting socket");
+        LOG(ERROR, str);
+        throw std::runtime_error(str);
     }
 
     LOG(INFO, "connected new socket.");
@@ -56,7 +60,9 @@ Socket get_listen_socket(std::string port)
     int opt = 1;
     int listen_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (!listen_socket) {
-        throw std::runtime_error("error opening listen socket.");
+        std::string str("error opening listen socket.");
+        LOG(ERROR, str);
+        throw std::runtime_error(str);
     }
 
     Socket result(listen_socket);
@@ -79,7 +85,10 @@ Socket get_listen_socket(std::string port)
     // we dont care which function failed, just throw an exception.
     // the socket will be closed by the Socket class
     if (status) {
-        throw std::runtime_error("error opening listen socket.");
+
+        std::string str("error opening listen socket.");
+        LOG(ERROR, str);
+        throw std::runtime_error(str);
     }
 
     return (result);
