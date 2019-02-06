@@ -9,7 +9,8 @@ void UserList::insert(user_ptr user)
     int fd(user->get_fd());
     m_fd_to_user.insert(std::pair<int, user_ptr>(fd, user));
 
-    m_name_to_user.insert(std::pair<std::string, user_ptr>(user->get_name(), user));
+    m_name_to_user.insert(
+        std::pair<std::string, user_ptr>(user->get_name(), user));
 }
 
 void UserList::remove(int fd)
@@ -19,12 +20,12 @@ void UserList::remove(int fd)
     m_name_to_user.erase(user->get_name());
 }
 
-std::map<const int, UserList::user_ptr >::iterator UserList::begin()
+std::map<const int, UserList::user_ptr>::iterator UserList::begin()
 {
     return m_fd_to_user.begin();
 }
 
-std::map<const int, UserList::user_ptr >::iterator UserList::end()
+std::map<const int, UserList::user_ptr>::iterator UserList::end()
 {
     return m_fd_to_user.end();
 }
@@ -55,7 +56,8 @@ void UserList::change_name(user_ptr user, const std::string& new_name)
     m_name_to_user.erase(old_name);
 
     user->set_name(new_name);
-    m_name_to_user.insert(std::pair<std::string, user_ptr>(user->get_name(), user));    
+    m_name_to_user.insert(
+        std::pair<std::string, user_ptr>(user->get_name(), user));
 }
 
 } // namespace ilrd

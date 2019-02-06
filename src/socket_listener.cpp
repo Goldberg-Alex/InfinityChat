@@ -13,7 +13,7 @@
 #include <stdexcept> //std::runtime_error
 #include <sys/un.h>  //sockaddr_un
 
-#include "config.hpp"         //tcp_backlog_size
+#include "config.hpp"          //tcp_backlog_size
 #include "socket_listener.hpp" //SocketListener
 
 //------------------------------------------------------------------------------
