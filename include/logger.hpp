@@ -42,7 +42,7 @@ private:
 
 #define LOG(level, message)                                                    \
     do {                                                                       \
-        Handleton<Logger>::get_instance()->write(Logger::log_level::level,     \
+        Handleton<Logger>::get_instance()->write(log_level::level,     \
                                                  message,                      \
                                                  __FILE__,                     \
                                                  __LINE__,                     \

@@ -74,7 +74,7 @@ Socket get_listen_socket(std::string port)
 
     status |= bind(listen_socket, (struct sockaddr*)&address, sizeof(address));
 
-    status |= listen(listen_socket, tcp_backlog_size);
+    status |= listen(listen_socket, TCP_BACKLOG_SIZE);
 
     // we dont care which function failed, just throw an exception.
     // the socket will be closed by the Socket class

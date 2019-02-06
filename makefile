@@ -49,7 +49,7 @@ $(TEST_EXEC) : $(TEST_OBJ)
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(TEST_SRC)
 
 	@echo "---------------Linking-----------------"
-	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o $(OBJ_DIR)client.o, $(OBJ)) $< 
+		$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o $(OBJ_DIR)client.o, $(OBJ)) $(OBJ_DIR)$(@F:.out=.o)
 
 	@echo "---------------Testing-----------------"
 	$(VLG) $(VLGFLAGS) ./$@
