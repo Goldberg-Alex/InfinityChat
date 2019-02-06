@@ -79,7 +79,7 @@ $(TEST_OBJ) : $(TEST_SRC)
 	@mkdir -p $(OBJ_DIR)
 
 	@echo "--------------Compiling----------------"
-	$(CXX) $(CXXFLAGS) -c $(SRC_TEST_DIR)$(<F) -o $@
+	$(CXX) $(CXXFLAGS) -c $(SRC_TEST_DIR)$(@F:.o=.cpp) -o $@
 
 # Create .d files
 $(DEPEND_DIR)%.d: $(SRC_DIR)%.cpp

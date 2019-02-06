@@ -16,7 +16,6 @@ namespace ilrd {
 
 class Logger {
 public:
-
     void write(enum log_level log_level,
                const std::string& message,
                std::string&& filename,
@@ -42,11 +41,8 @@ private:
 
 #define LOG(level, message)                                                    \
     do {                                                                       \
-        Handleton<Logger>::get_instance()->write(log_level::level,     \
-                                                 message,                      \
-                                                 __FILE__,                     \
-                                                 __LINE__,                     \
-                                                 __FUNCTION__);                \
+        Handleton<Logger>::get_instance()->write(                              \
+            log_level::level, message, __FILE__, __LINE__, __FUNCTION__);      \
     } while (0);
 
 } // namespace ilrd
