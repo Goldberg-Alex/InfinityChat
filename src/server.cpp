@@ -8,7 +8,7 @@
 // this is the main server implementation
 #include <unistd.h> //STDIN_FILENO
 
-#include "config.hpp"          //tcp_listen_port
+#include "config.hpp"          //TCP_LISTEN_PORT
 #include "epoll.hpp"           //Epoll
 #include "socket_listener.hpp" //SocketCreator
 
@@ -22,7 +22,7 @@ void init_server();
 int main()
 {
     Epoll epoll;
-    SocketListener listener(tcp_listen_port);
+    SocketListener listener(TCP_LISTEN_PORT);
 
     epoll.add(STDIN_FILENO, EPOLLIN);
     epoll.add(listener.get_fd(), EPOLLIN);

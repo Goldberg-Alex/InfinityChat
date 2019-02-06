@@ -14,6 +14,7 @@
 #include <sys/un.h>  //sockaddr_un
 
 #include "config.hpp"          //tcp_backlog_size
+#include "logger.hpp"          //Logger
 #include "socket_listener.hpp" //SocketListener
 
 //------------------------------------------------------------------------------
@@ -41,6 +42,7 @@ Socket SocketListener::connect() const
         throw std::runtime_error("error connecting socket");
     }
 
+    LOG(INFO, "connected new socket.");
     return (Socket(socket));
 }
 

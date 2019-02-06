@@ -5,11 +5,25 @@
 // Review Date-
 //-----------------------------------------
 
-//common definitions and declarations for the project
+#ifndef ILRD_CONFIG_HPP
+#define ILRD_CONFIG_HPP
 
-//the port number in the server to listen for incoming connections
-//and also the port number to connect to in the client
-const char tcp_listen_port[] = "10000";
+namespace ilrd {
 
-//number of allowed pending requests to the tcp socket we're listening to
-const int tcp_backlog_size = 100;
+// common definitions and declarations for the project
+
+// the port number in the server to listen for incoming connections
+// and also the port number to connect to in the client
+const char TCP_LISTEN_PORT[] = "10000";
+
+// number of allowed pending requests to the tcp socket we're listening to
+const int TCP_BACKLOG_SIZE = 100;
+
+// Logger logging level. DEBUG > INFO > ERROR. logs lower than the log level
+// will not be saved
+enum log_level { ERROR = 0, INFO = 1, DEBUG = 2 };
+const enum log_level LOG_LEVEL = INFO;
+
+const char LOG_FILENAME[] = "log.txt";
+} // namespace ilrd
+#endif // ILRD_CONFIG_HPP
