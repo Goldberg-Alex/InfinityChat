@@ -12,6 +12,7 @@ namespace ilrd {
 
 class User;
 
+//------------------------------------------------------------------------------
 class Command {
 public:
     Command(User& user, std::string args);
@@ -32,6 +33,7 @@ protected:
     std::string m_args;
 };
 
+//------------------------------------------------------------------------------
 class Message : public Command {
 public:
     Message(User& user, std::string msg);
@@ -42,6 +44,7 @@ public:
     static std::unique_ptr<Command> creator(User& user, std::string msg);
 };
 
+//------------------------------------------------------------------------------
 class ChangeName : public Command {
 public:
     ChangeName(User& user, std::string new_name);
@@ -52,6 +55,7 @@ public:
     static std::unique_ptr<Command> creator(User& user, std::string new_name);
 };
 
+//------------------------------------------------------------------------------
 class List : public Command {
 public:
     List(User& user);
@@ -62,6 +66,7 @@ public:
     static std::unique_ptr<Command> creator(User& user);
 };
 
+//------------------------------------------------------------------------------
 class Whisper : public Command {
 public:
     Whisper(User& user, std::string name, std::string msg);
@@ -76,6 +81,7 @@ private:
     std::string m_name;
 };
 
+//------------------------------------------------------------------------------
 } // namespace ilrd
 
 #endif // ILRD_USER_LIST_HPP
