@@ -26,7 +26,7 @@ Socket::~Socket()
     close(m_fd);
 }
 
-static Socket create(const std::string& ip_address, const std::string& port)
+Socket Socket::create(const std::string& ip_address, const std::string& port)
 {
     int soc_fd = socket(AF_INET, SOCK_STREAM, 0);
 
