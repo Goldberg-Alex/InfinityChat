@@ -34,7 +34,7 @@ const std::shared_ptr<User> Command::get_user() const
 Message::Message(std::shared_ptr<User> user, std::string msg) : Command(user, msg)
 {}
 
-std::unique_ptr<Command> Message::creator(CommandParams&& params)
+std::unique_ptr<Command> Message::create(CommandParams&& params)
 {
     std::unique_ptr<Command> message(new Message(params.user, params.args));
     if (!message) {
@@ -55,7 +55,7 @@ List::List(std::shared_ptr<User> user, const UserList& list) :
                                 Command(user, ""), m_list(list)
 {}
 
-std::unique_ptr<Command> List::creator(CommandParams&& params)
+std::unique_ptr<Command> List::create(CommandParams&& params)
 {
     std::unique_ptr<Command> list(new List(params.user, params.list));
     if (!list) {

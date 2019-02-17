@@ -32,9 +32,11 @@ int main()
     epoll.add(STDIN_FILENO, EPOLLIN);
     epoll.add(listener.get_fd(), EPOLLIN);
 
-    Factory<Command, std::string, CommandParams> factory();
+    Factory<Command, std::string, CommandParams> factory;
 
-    factory.add(&Message::create, "")
+    // factory.add(Message::key, &Message::create);
+    // add the rest of the tasks in the same way
+
     bool stop = false;
 
     LOG(INFO, "entering event loop.");
