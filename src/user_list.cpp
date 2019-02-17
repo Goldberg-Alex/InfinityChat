@@ -5,10 +5,10 @@
 // Review Date-
 //-----------------------------------------
 
-// Implementation for Two-Keys Map  
+// Implementation for Two-Keys Map
 
-#include "logger.hpp"
 #include "user_list.hpp"
+#include "logger.hpp"
 
 namespace ilrd {
 UserList::UserList() : m_fd_to_user(), m_name_to_user()
@@ -23,7 +23,7 @@ void UserList::insert(user_ptr user)
 
     m_name_to_user.insert(
         std::pair<std::string, user_ptr>(user->get_name(), user));
-    
+
     LOG(DEBUG, "inserted new user to list");
 }
 
@@ -75,7 +75,7 @@ void UserList::change_name(user_ptr user, const std::string& new_name)
     user->set_name(new_name);
     m_name_to_user.insert(
         std::pair<std::string, user_ptr>(user->get_name(), user));
-    
+
     LOG(DEBUG, "changed name for user");
 }
 

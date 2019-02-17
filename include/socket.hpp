@@ -24,6 +24,9 @@ public:
 
     ~Socket();
 
+    static Socket create(const std::string& ip_address,
+                         const std::string& port);
+
     void send(const std::string& message) const;
     const std::string& receive() const;
 

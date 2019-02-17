@@ -33,8 +33,7 @@ int main()
     LOG(INFO, "entering event loop.");
 
     while (!stop) {
-        stop = true;
-        break;
+        
         int num_events = epoll.wait(0);
         for (int i = 0; i < num_events; i++) {
 

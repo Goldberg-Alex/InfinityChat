@@ -47,7 +47,7 @@ $(TEST_EXEC) : $(TEST_OBJ)
 	@mkdir -p $(TEST_DIR)
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(TEST_SRC)
 
-		$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o $(OBJ_DIR)client.o, $(OBJ)) $(OBJ_DIR)$(@F:.out=.o)
+	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o $(OBJ_DIR)client.o, $(OBJ)) $(OBJ_DIR)$(@F:.out=.o)
 
 	@echo "---------------Testing-----------------"
 	$(VLG) $(VLGFLAGS) ./$@
