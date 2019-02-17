@@ -49,6 +49,8 @@ int main(int argc, char const *argv[])
                     LOG(INFO, "user is out");
                     break;
                 }
+
+                socket.send(str);
             } else {
                 //get something from the server
             }
