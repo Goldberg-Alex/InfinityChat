@@ -1,16 +1,23 @@
 // TODO
 
-#ifndef ILRD_USER_LIST_HPP
-#define ILRD_USER_LIST_HPP
+#ifndef ILRD_COMMAND_HPP
+#define ILRD_COMMAND_HPP
 
 #include <memory> //std::unique_ptr
 #include <string> // string
 
+#include "user_list.hpp"
 #include "user.hpp"
 
 namespace ilrd {
 
 class User;
+
+struct CommandParams {
+    std::shared_ptr<User> user;
+    std::string args;
+    UserList& list;
+};
 
 //------------------------------------------------------------------------------
 class Command {
@@ -40,7 +47,8 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> creator(std::shared_ptr<User> user, std::string msg);
+    // parameters: std::shared_ptr<User> user, std::string msg
+    static std::unique_ptr<Command> creator(CommandParams&& params);
 
 private:
     Message(std::shared_ptr<User> user, std::string msg);
@@ -53,7 +61,8 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> creator(std::shared_ptr<User> user, std::string new_name);
+    // parameters: std::shared_ptr<User> user, std::string new_name
+    static std::unique_ptr<Command> creator(CommandParams&& params);
 
 private:
     ChangeName(std::shared_ptr<User> user, std::string new_name);
@@ -66,10 +75,13 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> creator(std::shared_ptr<User> user);
+    // parameters: std::shared_ptr<User> user, UserList& list
+    static std::unique_ptr<Command> creator(CommandParams&& params);
 
 private:
-    List(std::shared_ptr<User> user);
+    List(std::shared_ptr<User> user, const UserList& list);
+
+    const UserList& m_list;
 };
 
 //------------------------------------------------------------------------------
@@ -79,8 +91,8 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command>
-    creator(std::shared_ptr<User> user, std::string name, std::string msg);
+    // parameters: std::shared_ptr<User> user, std::string name, std::string msg
+    static std::unique_ptr<Command> creator(CommandParams&& params);
 
 private:
     Whisper(std::shared_ptr<User> user, std::string name, std::string msg);
@@ -91,4 +103,4 @@ private:
 //------------------------------------------------------------------------------
 } // namespace ilrd
 
-#endif // ILRD_USER_LIST_HPP
+#endif // ILRD_COMMAND_HPP
