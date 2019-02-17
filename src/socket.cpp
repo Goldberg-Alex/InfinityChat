@@ -44,6 +44,7 @@ Socket Socket::create(const std::string& ip_address, const std::string& port)
     std::memset(&serv_addr, '0', sizeof(serv_addr));
 
     serv_addr.sin_family = AF_INET;
+    //!does port need to be converted with htonl?
     serv_addr.sin_port = static_cast<unsigned short>(std::stoul(port));
 
     if (1 != inet_pton(AF_INET, ip_address.c_str(), &serv_addr.sin_addr)) {

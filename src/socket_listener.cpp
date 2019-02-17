@@ -37,7 +37,7 @@ Socket SocketListener::connect() const
     socklen_t peer_addr_size = sizeof(peer_addr);
 
     int socket = accept(m_listen_socket.get_fd(),
-                        (struct sockaddr*)&peer_addr,
+                        reinterpret_cast<struct sockaddr*>(&peer_addr),
                         &peer_addr_size);
 
     if (-1 == socket) {
@@ -76,9 +76,12 @@ Socket get_listen_socket(std::string port)
     struct sockaddr_in address;
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(stoul(port));
+    //! does port need to be converted with htonl?
+    address.sin_port = static_cast<unsigned short>(std::stoul(port));
 
-    status |= bind(listen_socket, (struct sockaddr*)&address, sizeof(address));
+    status |= bind(listen_socket,
+                   reinterpret_cast<struct sockaddr*>(&address),
+                   sizeof(address));
 
     status |= listen(listen_socket, TCP_BACKLOG_SIZE);
 

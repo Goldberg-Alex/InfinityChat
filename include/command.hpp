@@ -40,7 +40,7 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> creator(std::shared_ptr<User> user, std::string msg);
+    static std::unique_ptr<Command> create(std::shared_ptr<User> user, std::string msg);
 
 private:
     Message(std::shared_ptr<User> user, std::string msg);
@@ -53,7 +53,7 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> creator(std::shared_ptr<User> user, std::string new_name);
+    static std::unique_ptr<Command> create(std::shared_ptr<User> user, std::string new_name);
 
 private:
     ChangeName(std::shared_ptr<User> user, std::string new_name);
@@ -66,7 +66,7 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> creator(std::shared_ptr<User> user);
+    static std::unique_ptr<Command> create(std::shared_ptr<User> user);
 
 private:
     List(std::shared_ptr<User> user);
@@ -80,7 +80,7 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command>
-    creator(std::shared_ptr<User> user, std::string name, std::string msg);
+    create(std::shared_ptr<User> user, std::string name, std::string msg);
 
 private:
     Whisper(std::shared_ptr<User> user, std::string name, std::string msg);
