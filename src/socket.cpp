@@ -44,7 +44,7 @@ static Socket create(const std::string& ip_address, const std::string& port)
     std::memset(&serv_addr, '0', sizeof(serv_addr));
 
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = std::stoul(port);
+    serv_addr.sin_port = static_cast<unsigned short>(std::stoul(port));
 
     if (1 != inet_pton(AF_INET, ip_address.c_str(), &serv_addr.sin_addr)) {
         std::string str("invalid ip address.");
@@ -52,7 +52,7 @@ static Socket create(const std::string& ip_address, const std::string& port)
         throw std::runtime_error(str);
     }
 
-    if (connect(soc_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+    if (connect(soc_fd, reinterpret_cast<struct sockaddr*>(&serv_addr), sizeof(serv_addr)) < 0) {
         std::string str("connecting socket failed.");
         LOG(ERROR, str);
         throw std::runtime_error(str);
@@ -63,7 +63,7 @@ static Socket create(const std::string& ip_address, const std::string& port)
 
 void Socket::send(const std::string& message) const
 {
-    int written_bytes = write(m_fd, message.c_str(), message.size());
+    ssize_t written_bytes = write(m_fd, message.c_str(), message.size());
 
     if (-1 == written_bytes) {
         throw std::runtime_error("error writing to socket");
@@ -76,7 +76,7 @@ const std::string& Socket::receive() const
     static char buffer[BUFFER_SIZE];
     std::string result;
 
-    int read_bytes;
+    ssize_t read_bytes;
 
     do {
         memset(buffer, 0, BUFFER_SIZE);

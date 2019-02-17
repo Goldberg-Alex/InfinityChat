@@ -18,8 +18,8 @@ UserList::UserList() : m_fd_to_user(), m_name_to_user()
 
 void UserList::insert(user_ptr user)
 {
-    int fd(user->get_fd());
-    m_fd_to_user.insert(std::pair<int, user_ptr>(fd, user));
+
+    m_fd_to_user.insert(std::pair<int, user_ptr>(user->get_fd(), user));
 
     m_name_to_user.insert(
         std::pair<std::string, user_ptr>(user->get_name(), user));
