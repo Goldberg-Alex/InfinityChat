@@ -28,5 +28,8 @@ const std::string& User::get_name() const
 {
     return (m_name);
 }
-
+const Socket& User::get_socket()
+{
+    return (m_socket);
+}
 } // namespace ilrd

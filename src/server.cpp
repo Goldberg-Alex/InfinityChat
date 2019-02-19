@@ -6,6 +6,7 @@
 //-----------------------------------------
 
 // this is the main server implementation
+#include <memory>   //std::make_shared
 #include <unistd.h> //STDIN_FILENO
 
 #include "command.hpp"         //commands
@@ -26,8 +27,11 @@ void init_server()
 
 int main()
 {
-    SocketListener listener(TCP_LISTEN_PORT);
+    // this is just to init the logger to the correct file
+    Handleton<Logger>::get_instance("server_log.txt");
 
+    SocketListener listener(TCP_LISTEN_PORT);
+    UserList user_list;
     Epoll epoll;
     epoll.add(STDIN_FILENO, EPOLLIN);
     epoll.add(listener.get_fd(), EPOLLIN);
@@ -43,15 +47,24 @@ int main()
 
     while (!stop) {
 
-        int num_events = epoll.wait(0);
+        int num_events = epoll.wait(-1);
         for (int i = 0; i < num_events; i++) {
 
             if (STDIN_FILENO == epoll[i].m_fd) {
                 // handle stdin
             } else if (listener.get_fd() == epoll[i].m_fd) {
-                // create new user
-                // insert user into the user list
+                LOG(INFO, "new user connected");
+                Socket socket = listener.connect();
+                socket.send("hello");
+                LOG(INFO, "sent reply");
+                auto user = std::make_shared<User>(std::move(socket));
+                user_list.insert(user);
+                LOG(INFO, "created new user and inserted into user list");
             } else if (epoll[i].m_event_type == EPOLLIN) {
+                const Socket& socket =
+                    (user_list.find(epoll[i].m_fd))->get_socket();
+                auto message = socket.receive();
+                socket.send(message);
                 // create command
                 // insert command into the command queue
             } else if (epoll[i].m_event_type == EPOLLHUP) {
