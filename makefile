@@ -2,7 +2,7 @@ SERVER = server.out
 CLIENT = client.out
 
 CXX = clang++
-CXXFLAGS = -std=c++11 -pedantic-errors -Weverything -Wno-padded -Weffc++ \
+CXXFLAGS = -std=c++11 -pedantic-errors -Wall -Wextra -Wno-padded -Weffc++ \
 -Wno-c++98-compat -g -pthread -I$(HEADERS) 
 DEPENDENCY_OPTIONS = -MM -std=c++11 -I$(HEADERS) 
 

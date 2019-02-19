@@ -1,18 +1,23 @@
 // TODO
 
-#ifndef ILRD_USER_LIST_HPP
-#define ILRD_USER_LIST_HPP
+#ifndef ILRD_COMMAND_HPP
+#define ILRD_COMMAND_HPP
 
 #include <memory> //std::unique_ptr
 #include <string> // string
 
 #include "user.hpp"
+#include "user_list.hpp"
 
 namespace ilrd {
 
 class User;
 
-class CommandParams;
+struct CommandParams {
+    std::string args;
+    std::shared_ptr<User> user;
+    const UserList& list;
+};
 //------------------------------------------------------------------------------
 class Command {
 public:
@@ -37,7 +42,7 @@ protected:
 //------------------------------------------------------------------------------
 class Message : public Command {
 public:
-    ~Message() = default;
+    ~Message() override = default;
 
     void execute() override;
 
@@ -51,7 +56,7 @@ private:
 //------------------------------------------------------------------------------
 class ChangeName : public Command {
 public:
-    ~ChangeName() = default;
+    ~ChangeName() override = default;
 
     void execute() override;
 
@@ -64,20 +69,21 @@ private:
 //------------------------------------------------------------------------------
 class List : public Command {
 public:
-    ~List() = default;
+    ~List() override = default;
 
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
 
 private:
-    List(std::shared_ptr<User> user);
+    List(std::shared_ptr<User> user, const UserList& list);
+    const UserList& m_list;
 };
 
 //------------------------------------------------------------------------------
 class Whisper : public Command {
 public:
-    ~Whisper() = default;
+    ~Whisper() override = default;
 
     void execute() override;
 
@@ -92,4 +98,4 @@ private:
 //------------------------------------------------------------------------------
 } // namespace ilrd
 
-#endif // ILRD_USER_LIST_HPP
+#endif // ILRD_COMMAND_HPP
