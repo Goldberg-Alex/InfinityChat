@@ -53,9 +53,9 @@ int main(int argc, char const* argv[])
                 std::cin >> str;
                 if (str[0] != '/') {
                     str = "/say " + str;
-                    socket.send(str);
                 }
-
+                std::cout<<"msg: "<<str<<std::endl;
+                    socket.send(str);
                 if (str == "/quit") {
                     stop = true;
                     LOG(INFO, "user is out");
@@ -69,6 +69,7 @@ int main(int argc, char const* argv[])
         }
     }
 
+    LOG(INFO, "chat is down");
     return 0;
 }
 

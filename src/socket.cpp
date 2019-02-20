@@ -24,6 +24,7 @@ Socket::Socket(int fd) : m_fd(fd)
 
 Socket::~Socket()
 {
+    LOG(INFO, "closed socket fd: " + std::to_string(m_fd));
     close(m_fd);
 }
 
@@ -67,7 +68,8 @@ Socket Socket::create(const std::string& ip_address, const std::string& port)
 
 void Socket::send(const std::string& message) const
 {
-    ssize_t written_bytes = write(m_fd, message.c_str(), message.size());
+    ssize_t written_bytes =
+        ::send(m_fd, message.c_str(), message.size() + 1, MSG_NOSIGNAL);
 
     if (-1 == written_bytes) {
         std::string str("failed writing to socket");
@@ -106,6 +108,21 @@ std::string Socket::receive() const
 int Socket::get_fd() const
 {
     return (m_fd);
+}
+
+Socket::Socket(Socket&& other) : m_fd(other.m_fd)
+{
+    // -1 so we can close() it with no problems
+    other.m_fd = -1;
+}
+
+Socket& Socket::operator=(Socket&& other)
+{
+    m_fd = other.m_fd;
+    // -1 so we can close() it with no problems
+    other.m_fd = -1;
+
+    return (*this);
 }
 //------------------------------------------------------------------------------
 
