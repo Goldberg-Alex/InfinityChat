@@ -54,8 +54,8 @@ int main(int argc, char const* argv[])
                 if (str[0] != '/') {
                     str = "/say " + str;
                 }
-                std::cout<<"msg: "<<str<<std::endl;
-                    socket.send(str);
+                std::cout << "msg: " << str << std::endl;
+                socket.send(str);
                 if (str == "/quit") {
                     stop = true;
                     LOG(INFO, "user is out");

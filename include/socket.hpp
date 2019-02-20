@@ -19,8 +19,8 @@ class Socket {
 public:
     // receives an open socket
     explicit Socket(int fd);
-    Socket(Socket&&) = default;
-    Socket& operator=(Socket&&) = default;
+    Socket(Socket&&);
+    Socket& operator=(Socket&&);
 
     ~Socket();
 

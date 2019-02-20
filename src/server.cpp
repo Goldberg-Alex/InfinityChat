@@ -57,12 +57,13 @@ int main()
                 LOG(INFO, "new user connected");
                 Socket socket = listener.connect();
                 auto user = std::make_shared<User>(std::move(socket));
+                user->get_socket().send("connected");
                 user_list.insert(user);
                 LOG(INFO, "created new user and inserted into user list");
-                socket.send("connected");
+
             } else if (epoll[i].m_event_type == EPOLLIN) {
-                const Socket& socket =
-                    (user_list.find(epoll[i].m_fd))->get_socket();
+                auto user = user_list.find(epoll[i].m_fd);
+                const Socket& socket = user->get_socket();
 
                 LOG(INFO, "received message");
                 auto message = socket.receive();
