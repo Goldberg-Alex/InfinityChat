@@ -60,7 +60,7 @@ int main(int argc, char const* argv[])
                     stop = true;
                     LOG(INFO, "user is out");
                 }
-g
+
             } else if (socket.get_fd() == epoll[i].m_fd) {
                 auto msg = socket.receive();
                 std::cout << "got message: " << msg << '\n';
