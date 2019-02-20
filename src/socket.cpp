@@ -10,6 +10,7 @@
 #include <arpa/inet.h>  // inet_pton
 #include <cstring>      //memset()
 #include <cstring>      //memset
+#include <iostream>     //cout
 #include <stdexcept>    //std::runtime_error
 #include <sys/socket.h> //socket()
 #include <unistd.h>     //close(), read(), write()
@@ -44,7 +45,7 @@ Socket Socket::create(const std::string& ip_address, const std::string& port)
     std::memset(&serv_addr, '0', sizeof(serv_addr));
 
     serv_addr.sin_family = AF_INET;
-    //!does port need to be converted with htonl?
+    //! does port need to be converted with htonl?
     serv_addr.sin_port = static_cast<unsigned short>(std::stoul(port));
 
     if (1 != inet_pton(AF_INET, ip_address.c_str(), &serv_addr.sin_addr)) {
@@ -53,7 +54,9 @@ Socket Socket::create(const std::string& ip_address, const std::string& port)
         throw std::runtime_error(str);
     }
 
-    if (connect(soc_fd, reinterpret_cast<struct sockaddr*>(&serv_addr), sizeof(serv_addr)) < 0) {
+    if (connect(soc_fd,
+                reinterpret_cast<struct sockaddr*>(&serv_addr),
+                sizeof(serv_addr)) < 0) {
         std::string str("connecting socket failed.");
         LOG(ERROR, str);
         throw std::runtime_error(str);
@@ -65,13 +68,16 @@ Socket Socket::create(const std::string& ip_address, const std::string& port)
 void Socket::send(const std::string& message) const
 {
     ssize_t written_bytes = write(m_fd, message.c_str(), message.size());
+    std::cout << message << '\n';
 
     if (-1 == written_bytes) {
-        throw std::runtime_error("error writing to socket");
+        std::string str("failed writing to socket");
+        LOG(ERROR, str);
+        throw std::runtime_error(str);
     }
 }
 
-const std::string& Socket::receive() const
+std::string Socket::receive() const
 {
     static const int BUFFER_SIZE = 1024;
     static char buffer[BUFFER_SIZE];
@@ -86,9 +92,14 @@ const std::string& Socket::receive() const
             throw std::runtime_error("error reading from socket");
         }
 
-        result += buffer;
+        try {
+            result += buffer;
 
-    } while (read_bytes == BUFFER_SIZE);
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << '\n';
+        }
+
+    } while (read_bytes);
 
     return (std::move(result));
 }

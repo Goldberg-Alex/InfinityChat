@@ -28,7 +28,7 @@ public:
                          const std::string& port);
 
     void send(const std::string& message) const;
-    const std::string& receive() const;
+    std::string receive() const;
 
     int get_fd() const;
 

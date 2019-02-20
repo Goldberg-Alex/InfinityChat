@@ -41,6 +41,11 @@
         "deque": "cpp",
         "mutex": "cpp",
         "iomanip": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "map": "cpp",
+        "cmath": "cpp",
+        "cstddef": "cpp",
+        "list": "cpp",
+        "numeric": "cpp"
     }
 }

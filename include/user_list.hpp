@@ -16,7 +16,7 @@ namespace ilrd {
 class UserList {
 public:
     using user_ptr = std::shared_ptr<User>;
-    explicit UserList();
+     UserList();
 
     void insert(user_ptr user_);
     void remove(int fd);

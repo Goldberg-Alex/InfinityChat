@@ -18,6 +18,7 @@ public:
     void set_name(const std::string& name);
     int get_fd() const;
     const std::string& get_name() const;
+    const Socket& get_socket();
 
 private:
     const Socket m_socket;
