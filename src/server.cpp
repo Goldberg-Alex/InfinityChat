@@ -6,6 +6,7 @@
 //-----------------------------------------
 
 // this is the main server implementation
+#include <iostream> //std::cout
 #include <memory>   //std::make_shared
 #include <unistd.h> //STDIN_FILENO
 
@@ -55,8 +56,6 @@ int main()
             } else if (listener.get_fd() == epoll[i].m_fd) {
                 LOG(INFO, "new user connected");
                 Socket socket = listener.connect();
-                socket.send("hello");
-                LOG(INFO, "sent reply");
                 auto user = std::make_shared<User>(std::move(socket));
                 user_list.insert(user);
                 LOG(INFO, "created new user and inserted into user list");
@@ -64,7 +63,8 @@ int main()
                 const Socket& socket =
                     (user_list.find(epoll[i].m_fd))->get_socket();
                 auto message = socket.receive();
-                socket.send(message);
+                // socket.send(message);
+                std::cout << message << '\n';
                 // create command
                 // insert command into the command queue
             } else if (epoll[i].m_event_type == EPOLLHUP) {

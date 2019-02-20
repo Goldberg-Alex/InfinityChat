@@ -20,7 +20,7 @@ int main(int argc, char const* argv[])
 {
     // this is just to init the logger to the correct file
     Handleton<Logger>::get_instance("client_log.txt");
-    
+
     // if (argc < 2) {
     //     std::string str("not enough arguments to program");
     //     LOG(ERROR, str);
@@ -60,10 +60,11 @@ int main(int argc, char const* argv[])
                     stop = true;
                     LOG(INFO, "user is out");
                 }
-g
             } else if (socket.get_fd() == epoll[i].m_fd) {
                 auto msg = socket.receive();
-                std::cout << "got message: " << msg << '\n';
+                if (msg.size()) {
+                    std::cout << "message: " << msg << '\n';
+                }
             }
         }
     }
