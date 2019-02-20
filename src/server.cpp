@@ -49,6 +49,7 @@ int main()
     while (!stop) {
 
         int num_events = epoll.wait(-1);
+        LOG(DEBUG, "exit at epoll wait");
         for (int i = 0; i < num_events; i++) {
 
             if (STDIN_FILENO == epoll[i].m_fd) {
@@ -57,8 +58,11 @@ int main()
                 LOG(INFO, "new user connected");
                 Socket socket = listener.connect();
                 auto user = std::make_shared<User>(std::move(socket));
-                user->get_socket().send("connected");
+                std::cout<<user->get_socket().get_fd()<<std::endl;
+                user->get_socket().send("server connected");
+                epoll.add(user->get_socket().get_fd(), EPOLLIN);
                 user_list.insert(user);
+
                 LOG(INFO, "created new user and inserted into user list");
 
             } else if (epoll[i].m_event_type == EPOLLIN) {

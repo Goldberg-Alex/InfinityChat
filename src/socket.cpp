@@ -100,7 +100,7 @@ std::string Socket::receive() const
             std::cerr << e.what() << '\n';
         }
 
-    } while (read_bytes);
+    } while (read_bytes == BUFFER_SIZE);
 
     return (result);
 }
