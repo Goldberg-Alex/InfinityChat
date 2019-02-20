@@ -59,6 +59,7 @@ int main()
                 auto user = std::make_shared<User>(std::move(socket));
                 user_list.insert(user);
                 LOG(INFO, "created new user and inserted into user list");
+                socket.send("connected");
             } else if (epoll[i].m_event_type == EPOLLIN) {
                 const Socket& socket =
                     (user_list.find(epoll[i].m_fd))->get_socket();

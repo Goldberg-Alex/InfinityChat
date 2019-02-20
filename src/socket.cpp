@@ -68,7 +68,6 @@ Socket Socket::create(const std::string& ip_address, const std::string& port)
 void Socket::send(const std::string& message) const
 {
     ssize_t written_bytes = write(m_fd, message.c_str(), message.size());
-    std::cout << message << '\n';
 
     if (-1 == written_bytes) {
         std::string str("failed writing to socket");
