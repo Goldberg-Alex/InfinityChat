@@ -32,7 +32,7 @@ int main(int argc, char const* argv[])
 
     // Alex computer: 18
     // Evgeny computer: 21
-    std::string ip_address("10.3.0.21");
+    std::string ip_address("10.3.0.18");
     std::string port("10000");
 
     Socket socket(Socket::create(ip_address, port));

@@ -67,6 +67,11 @@ UserList::user_ptr UserList::find(int fd)
     return iter->second;
 }
 
+size_t UserList::size() const
+{
+    return (m_fd_to_user.size());
+}
+
 void UserList::change_name(user_ptr user, const std::string& new_name)
 {
     std::string old_name(user->get_name());

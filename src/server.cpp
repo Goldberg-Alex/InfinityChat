@@ -25,6 +25,18 @@ void init_server()
 {}
 
 //------------------------------------------------------------------------------
+void add_user(Epoll& epoll, UserList& user_list, SocketListener& listener)
+{
+    LOG(INFO, "new user connected");
+    Socket socket = listener.connect();
+    auto user = std::make_shared<User>(std::move(socket));
+    std::cout << user->get_socket().get_fd() << std::endl;
+    user->get_socket().send("server connected");
+    epoll.add(user->get_socket().get_fd(), EPOLLIN);
+    user_list.insert(user);
+
+    LOG(INFO, "created new user and inserted into user list");
+}
 
 int main()
 {
@@ -39,7 +51,7 @@ int main()
 
     Factory<Command, std::string, CommandParams> factory;
 
-    // factory.add(Message::key, &Message::create);
+    factory.add(Message::key, &Message::create);
     // add the rest of the tasks in the same way
 
     bool stop = false;
@@ -55,27 +67,20 @@ int main()
             if (STDIN_FILENO == epoll[i].m_fd) {
                 // handle stdin
             } else if (listener.get_fd() == epoll[i].m_fd) {
-                LOG(INFO, "new user connected");
-                Socket socket = listener.connect();
-                auto user = std::make_shared<User>(std::move(socket));
-                std::cout<<user->get_socket().get_fd()<<std::endl;
-                user->get_socket().send("server connected");
-                epoll.add(user->get_socket().get_fd(), EPOLLIN);
-                user_list.insert(user);
-
-                LOG(INFO, "created new user and inserted into user list");
-
+                add_user(epoll, user_list, listener);
             } else if (epoll[i].m_event_type == EPOLLIN) {
                 auto user = user_list.find(epoll[i].m_fd);
                 const Socket& socket = user->get_socket();
 
-                LOG(INFO, "received message");
                 auto message = socket.receive();
-                socket.send(message);
+                LOG(DEBUG, "received message: " + message);
 
-                std::cout << "message:" << '\n';
-                std::cout << message << '\n';
+                std::string args(message.substr(Message::key.size()));
 
+                CommandParams params{args, user, user_list};
+
+                auto command = factory.create(Message::key, std::move(params));
+                command->execute();
                 // create command
                 // insert command into the command queue
             } else if (epoll[i].m_event_type == EPOLLHUP) {

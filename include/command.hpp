@@ -1,5 +1,3 @@
-// TODO
-
 #ifndef ILRD_COMMAND_HPP
 #define ILRD_COMMAND_HPP
 
@@ -16,12 +14,12 @@ class User;
 struct CommandParams {
     std::string args;
     std::shared_ptr<User> user;
-    const UserList& list;
+    UserList& list;
 };
 //------------------------------------------------------------------------------
 class Command {
 public:
-    Command(std::shared_ptr<User> user, std::string args);
+    Command(CommandParams&& m_params);
     virtual ~Command() = default;
 
     const std::string& get_args() const;
@@ -35,8 +33,7 @@ public:
     Command& operator=(Command&) = delete;
 
 protected:
-    std::shared_ptr<User> m_user;
-    std::string m_args;
+    CommandParams m_params;
 };
 
 //------------------------------------------------------------------------------
@@ -47,10 +44,12 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
-    static constexpr char key[] = "say";
+    static const std::string key;
 
 private:
-    Message(std::shared_ptr<User> user, std::string msg);
+    Message(CommandParams&& params);
+
+    void single_message(const Socket& socket);
 };
 
 //------------------------------------------------------------------------------
