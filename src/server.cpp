@@ -62,9 +62,14 @@ int main()
             } else if (epoll[i].m_event_type == EPOLLIN) {
                 const Socket& socket =
                     (user_list.find(epoll[i].m_fd))->get_socket();
+
+                LOG(INFO, "received message");
                 auto message = socket.receive();
-                // socket.send(message);
+                socket.send(message);
+
+                std::cout << "message:" << '\n';
                 std::cout << message << '\n';
+
                 // create command
                 // insert command into the command queue
             } else if (epoll[i].m_event_type == EPOLLHUP) {
