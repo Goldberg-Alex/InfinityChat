@@ -101,7 +101,7 @@ std::string Socket::receive() const
 
     } while (read_bytes);
 
-    return (std::move(result));
+    return (result);
 }
 
 int Socket::get_fd() const
