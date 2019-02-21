@@ -49,12 +49,13 @@ std::unique_ptr<Command> Message::create(CommandParams&& params)
     }
 }
 
-const std::string Message::key("/say ");
+const std::string Message::key("/say");
 
 void Message::execute()
 {
     LOG(DEBUG, "sending message: " + Command::m_params.args);
-    std::string msg(Command::m_params.user->get_name() + ": " + Command::m_params.args);
+    std::string msg(Command::m_params.user->get_name() + ": " +
+                    Command::m_params.args);
 
     for (auto&& iter = Command::m_params.list.begin();
          iter != Command::m_params.list.end();
@@ -66,6 +67,42 @@ void Message::execute()
 
         iter->second->get_socket().send(msg);
     }
+}
+//------------------------------------------------------------------------------
+ChangeName::ChangeName(CommandParams&& params)
+    : Command(std::forward<CommandParams>(params))
+{}
+
+std::unique_ptr<Command> ChangeName::create(CommandParams&& params)
+{
+    try {
+        std::unique_ptr<Command> new_name(
+            new ChangeName(std::forward<CommandParams>(params)));
+        return new_name;
+    } catch (std::bad_alloc& e) {
+        LOG(ERROR, "failed to create ChangeName");
+        throw;
+    }
+}
+
+const std::string ChangeName::key("/name");
+
+void ChangeName::execute()
+{
+    LOG(DEBUG,
+        "changing name from " + m_params.user->get_name() + " to " +
+            m_params.args);
+
+    for (auto&& iter = m_params.list.begin(); iter != m_params.list.end();
+         ++iter) {
+        if (iter->second->get_name() == m_params.args) {
+            m_params.user->get_socket().send("Name " + m_params.args +
+                                             " is taken");
+            return;
+        }
+    }
+
+    m_params.list.change_name(m_params.user, m_params.args);
 }
 
 //------------------------------------------------------------------------------

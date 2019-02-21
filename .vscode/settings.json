@@ -46,6 +46,10 @@
         "cmath": "cpp",
         "cstddef": "cpp",
         "list": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "condition_variable": "cpp",
+        "optional": "cpp",
+        "string_view": "cpp",
+        "algorithm": "cpp"
     }
 }

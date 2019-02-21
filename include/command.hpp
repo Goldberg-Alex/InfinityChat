@@ -60,9 +60,10 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
+    static const std::string key;
 
 private:
-    ChangeName(std::shared_ptr<User> user, std::string new_name);
+    ChangeName(CommandParams&& params);
 };
 
 //------------------------------------------------------------------------------

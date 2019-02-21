@@ -6,6 +6,7 @@
 //-----------------------------------------
 
 // this is the main server implementation
+#include <cctype>   //std::isspace
 #include <iostream> //std::cout
 #include <memory>   //std::make_shared
 #include <unistd.h> //STDIN_FILENO
@@ -38,6 +39,15 @@ void add_user(Epoll& epoll, UserList& user_list, SocketListener& listener)
     LOG(INFO, "created new user and inserted into user list");
 }
 
+static size_t find_white_space(const std::string& str)
+{
+    size_t i(0);
+    for (; i < str.size() && !std::isspace(str[i]); ++i) 
+    {}
+
+    return i;
+}
+
 int main()
 {
     // this is just to init the logger to the correct file
@@ -52,6 +62,8 @@ int main()
     Factory<Command, std::string, CommandParams> factory;
 
     factory.add(Message::key, &Message::create);
+    factory.add(ChangeName::key, &ChangeName::create);
+
     // add the rest of the tasks in the same way
 
     bool stop = false;
@@ -75,21 +87,24 @@ int main()
 
                 auto message = socket.receive();
                 LOG(DEBUG, "received message: " + message);
-                std::string args;
-                
 
-                args = (message.substr(Message::key.size()));
-             
+                // parse string
+                size_t end_of_command(find_white_space(message));
+                std::string key = message.substr(0, end_of_command);
+                std::string args;
+                if (end_of_command < message.size()) {
+                    args = (message.substr(end_of_command + 1));
+                }
+
                 CommandParams params{args, user, user_list};
 
-                auto command = factory.create(Message::key, std::move(params));
+                auto command = factory.create(key, std::move(params));
                 command->execute();
                 // create command
                 // insert command into the command queue
             } else if (epoll[i].m_event_type == EPOLLHUP) {
-                    LOG(INFO, "client disconnected");
-
-            } 
+                LOG(INFO, "client disconnected");
+            }
         }
     }
 

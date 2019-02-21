@@ -38,7 +38,7 @@ int main(int argc, char const* argv[])
     Socket socket(Socket::create(ip_address, port));
 
     LOG(INFO, "socket connected");
-    socket.send("client connected");
+    //socket.send("client connected");
 
     Epoll epoll;
     epoll.add(STDIN_FILENO, EPOLLIN);
