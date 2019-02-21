@@ -32,7 +32,7 @@ int main(int argc, char const* argv[])
 
     // Alex computer: 18
     // Evgeny computer: 21
-    std::string ip_address("10.3.0.18");
+    std::string ip_address("10.3.0.21");
     std::string port("10000");
 
     Socket socket(Socket::create(ip_address, port));
@@ -46,6 +46,8 @@ int main(int argc, char const* argv[])
 
     LOG(INFO, "user is up");
 
+    std::string msg;
+    
     bool stop(false);
     while (!stop) {
 
@@ -53,25 +55,26 @@ int main(int argc, char const* argv[])
         LOG(DEBUG, "exit at epoll wait");
         for (int i = 0; i < num_events; i++) {
             if (STDIN_FILENO == epoll[i].m_fd) {
-                std::string msg;
-                std::cin >> msg;
+                getline(std::cin, msg);
                 
                 if (msg == "/quit") {
                     stop = true;
                     LOG(INFO, "user is out");
+                    break;
                 }
 
                 if (msg[0] != '/') {
                     msg = "/say " + msg;
                 }
-                LOG(DEBUG, "Message sent: " + msg);
+
                 socket.send(msg);
+                LOG(DEBUG, "Message sent: " + msg);
                 
             } else if (socket.get_fd() == epoll[i].m_fd) {
-                auto msg = socket.receive();
+                msg = socket.receive();
                 LOG(DEBUG, "Message received: " + msg);
                 if (msg.size()) {
-                    std::cout << "message: " << msg << '\n';
+                    std::cout << msg << '\n';
                 }
             }
         }

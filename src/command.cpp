@@ -54,12 +54,17 @@ const std::string Message::key("/say ");
 void Message::execute()
 {
     LOG(DEBUG, "sending message: " + Command::m_params.args);
+    std::string msg(Command::m_params.user->get_name() + ": " + Command::m_params.args);
 
     for (auto&& iter = Command::m_params.list.begin();
          iter != Command::m_params.list.end();
          ++iter) {
 
-        iter->second->get_socket().send(Command::m_params.args);
+        if (iter->second->get_fd() == Command::m_params.user->get_fd()) {
+            continue;
+        }
+
+        iter->second->get_socket().send(msg);
     }
 }
 

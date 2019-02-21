@@ -65,7 +65,8 @@ int main()
         for (int i = 0; i < num_events; i++) {
 
             if (STDIN_FILENO == epoll[i].m_fd) {
-                // handle stdin
+                stop = true;
+                break;
             } else if (listener.get_fd() == epoll[i].m_fd) {
                 add_user(epoll, user_list, listener);
             } else if (epoll[i].m_event_type == EPOLLIN) {
@@ -74,9 +75,11 @@ int main()
 
                 auto message = socket.receive();
                 LOG(DEBUG, "received message: " + message);
+                std::string args;
+                
 
-                std::string args(message.substr(Message::key.size()));
-
+                args = (message.substr(Message::key.size()));
+             
                 CommandParams params{args, user, user_list};
 
                 auto command = factory.create(Message::key, std::move(params));
@@ -84,9 +87,9 @@ int main()
                 // create command
                 // insert command into the command queue
             } else if (epoll[i].m_event_type == EPOLLHUP) {
-                // remove user from user list
-                // delete user
-            }
+                    LOG(INFO, "client disconnected");
+
+            } 
         }
     }
 

@@ -22,7 +22,7 @@ const int TCP_BACKLOG_SIZE = 100;
 // Logger logging level. DEBUG > INFO > ERROR. individual logs lower than the
 // log level will not be written
 enum log_level { ERROR = 0, INFO = 1, DEBUG = 2 };
-const enum log_level LOG_LEVEL = INFO;
+const enum log_level LOG_LEVEL = DEBUG;
 
 const char LOG_FILENAME[] = "log.txt";
 } // namespace ilrd
