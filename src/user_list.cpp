@@ -6,6 +6,7 @@
 //-----------------------------------------
 
 // Implementation for Two-Keys Map
+#include <stdexcept> // std::logic_error
 
 #include "user_list.hpp"
 #include "logger.hpp"
@@ -18,11 +19,16 @@ UserList::UserList() : m_fd_to_user(), m_name_to_user()
 
 void UserList::insert(user_ptr user)
 {
-
     m_fd_to_user.insert(std::pair<int, user_ptr>(user->get_fd(), user));
 
-    m_name_to_user.insert(
-        std::pair<std::string, user_ptr>(user->get_name(), user));
+    try {
+        m_name_to_user.insert(
+            std::pair<std::string, user_ptr>(user->get_name(), user));
+    } catch (const std::exception& e) {
+        m_fd_to_user.erase(user->get_fd());
+        LOG(ERROR, "failed to insert user into user list");
+        throw;
+    }
 
     LOG(DEBUG, "inserted new user to list");
 }
@@ -60,8 +66,9 @@ UserList::user_ptr UserList::find(int fd)
 {
     auto iter = m_fd_to_user.find(fd);
     if (iter == m_fd_to_user.end()) {
-        LOG(ERROR, "can't find user via fd");
-        return user_ptr(nullptr);
+        std::string error("can't find user via fd");
+        LOG(ERROR, error);
+        throw std::logic_error(error);
     }
 
     return iter->second;
@@ -75,11 +82,17 @@ size_t UserList::size() const
 void UserList::change_name(user_ptr user, const std::string& new_name)
 {
     std::string old_name(user->get_name());
-    m_name_to_user.erase(old_name);
+    
+    try {
+        m_name_to_user.insert(
+            std::pair<std::string, user_ptr>(new_name, user));
+    } catch (const std::exception& e) {
+        LOG(ERROR, "failed to change name");
+        throw;
+    }
 
     user->set_name(new_name);
-    m_name_to_user.insert(
-        std::pair<std::string, user_ptr>(user->get_name(), user));
+    m_name_to_user.erase(old_name);
 
     LOG(DEBUG, "changed name for user");
 }
