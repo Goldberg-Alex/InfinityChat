@@ -24,6 +24,7 @@ public:
 
     ~Socket();
 
+    // throws std::logic_error, std::runtime_error
     static Socket create(const std::string& ip_address,
                          const std::string& port);
 

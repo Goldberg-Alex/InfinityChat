@@ -90,14 +90,18 @@ std::string Socket::receive() const
         memset(buffer, 0, BUFFER_SIZE);
         read_bytes = read(m_fd, buffer, BUFFER_SIZE);
         if (-1 == read_bytes) {
-            throw std::runtime_error("error reading from socket");
+
+            std::string str("error reading from socket");
+            LOG(ERROR, str);
+            throw std::runtime_error(str);
         }
 
         try {
             result += buffer;
 
         } catch (const std::exception& e) {
-            std::cerr << e.what() << '\n';
+            LOG(ERROR, e.what());
+            throw;
         }
 
     } while (read_bytes == BUFFER_SIZE);
