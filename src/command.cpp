@@ -16,6 +16,11 @@
 #include "logger.hpp"
 namespace ilrd {
 
+//------------------------------------------------------------------------------
+const std::string Message::key("/say");
+const std::string ChangeName::key("/name");
+
+//------------------------------------------------------------------------------
 Command::Command(CommandParams&& params)
     : m_params(std::forward<CommandParams>(params))
 {}
@@ -48,8 +53,6 @@ std::unique_ptr<Command> Message::create(CommandParams&& params)
         throw;
     }
 }
-
-const std::string Message::key("/say");
 
 void Message::execute()
 {
@@ -85,21 +88,17 @@ std::unique_ptr<Command> ChangeName::create(CommandParams&& params)
     }
 }
 
-const std::string ChangeName::key("/name");
-
 void ChangeName::execute()
 {
     LOG(DEBUG,
         "changing name from " + m_params.user->get_name() + " to " +
             m_params.args);
 
-    for (auto&& iter = m_params.list.begin(); iter != m_params.list.end();
-         ++iter) {
-        if (iter->second->get_name() == m_params.args) {
-            m_params.user->get_socket().send("Name " + m_params.args +
-                                             " is taken");
-            return;
-        }
+    auto user = m_params.list.find(m_params.args);
+    if (user) {
+        LOG(DEBUG, "Name " + m_params.args + " is taken");
+        m_params.user->get_socket().send("Name " + m_params.args + " is taken");
+        return;
     }
 
     m_params.list.change_name(m_params.user, m_params.args);
