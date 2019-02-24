@@ -42,8 +42,8 @@ void add_user(Epoll& epoll, UserList& user_list, SocketListener& listener)
 static size_t find_white_space(const std::string& str)
 {
     size_t i(0);
-    for (; i < str.size() && !std::isspace(str[i]); ++i) 
-    {}
+    for (; i < str.size() && !std::isspace(str[i]); ++i) {
+    }
 
     return i;
 }
@@ -86,10 +86,13 @@ int main()
                 const Socket& socket = user->get_socket();
 
                 auto message = socket.receive();
-                
+
                 // client disconnected
-                if (message == "\0") continue;
-                
+                if (message == "\0") {
+                    // remove user from list
+                    continue;
+                }
+
                 LOG(DEBUG, "received message: " + message);
 
                 // parse string
