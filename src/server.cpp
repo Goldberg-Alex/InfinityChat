@@ -86,6 +86,10 @@ int main()
                 const Socket& socket = user->get_socket();
 
                 auto message = socket.receive();
+                
+                // client disconnected
+                if (message == "\0") continue;
+                
                 LOG(DEBUG, "received message: " + message);
 
                 // parse string
@@ -93,7 +97,7 @@ int main()
                 std::string key = message.substr(0, end_of_command);
                 std::string args;
                 if (end_of_command < message.size()) {
-                    args = (message.substr(end_of_command + 1));
+                    args = message.substr(end_of_command + 1);
                 }
 
                 CommandParams params{args, user, user_list};
