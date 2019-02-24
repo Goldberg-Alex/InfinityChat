@@ -45,7 +45,6 @@ Message::Message(CommandParams&& params)
 
 std::unique_ptr<Command> Message::create(CommandParams&& params)
 {
-
     try {
         std::unique_ptr<Command> message(
             new Message(std::forward<CommandParams>(params)));
