@@ -19,6 +19,7 @@ UserList::UserList() : m_fd_to_user(), m_name_to_user()
 
 void UserList::insert(user_ptr user)
 {
+    ScopeLock<std::recursive_mutex> lock(m_lock);
     m_fd_to_user.insert(std::pair<int, user_ptr>(user->get_fd(), user));
 
     try {
@@ -35,6 +36,8 @@ void UserList::insert(user_ptr user)
 
 void UserList::remove(int fd)
 {
+    ScopeLock<std::recursive_mutex> lock(m_lock);
+
     auto user = m_fd_to_user[fd];
     m_fd_to_user.erase(fd);
     m_name_to_user.erase(user->get_name());
@@ -54,6 +57,8 @@ std::map<const int, UserList::user_ptr>::iterator UserList::end()
 
 UserList::user_ptr UserList::find(const std::string& name)
 {
+    ScopeLock<std::recursive_mutex> lock(m_lock);
+
     auto iter = m_name_to_user.find(name);
     if (iter == m_name_to_user.end()) {
         return user_ptr(nullptr);
@@ -64,6 +69,8 @@ UserList::user_ptr UserList::find(const std::string& name)
 
 UserList::user_ptr UserList::find(int fd)
 {
+    ScopeLock<std::recursive_mutex> lock(m_lock);
+
     auto iter = m_fd_to_user.find(fd);
     if (iter == m_fd_to_user.end()) {
         std::string error("can't find user via fd");
@@ -74,13 +81,21 @@ UserList::user_ptr UserList::find(int fd)
     return iter->second;
 }
 
-size_t UserList::size() const
+size_t UserList::size()
 {
+    ScopeLock<std::recursive_mutex> lock(m_lock);
     return (m_fd_to_user.size());
 }
 
 void UserList::change_name(user_ptr user, const std::string& new_name)
 {
+    ScopeLock<std::recursive_mutex> lock(m_lock);
+
+    if (find(new_name)) {
+        // new_name is taken, return
+        return;
+    }
+
     std::string old_name(user->get_name());
     
     try {

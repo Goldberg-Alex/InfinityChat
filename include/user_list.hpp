@@ -7,8 +7,10 @@
 
 #include <map>    // map
 #include <memory> // shared_ptr
+#include <mutex>  // mutex
 #include <string> // string
 
+#include "scopelock.hpp"
 #include "user.hpp"
 
 namespace ilrd {
@@ -27,7 +29,7 @@ public:
     // returns nullptr in failure
     user_ptr find(const std::string& name);
     user_ptr find(int fd);
-    size_t size() const;
+    size_t size();
     // NOTE: change name doesnt check if new name is correct
     void change_name(user_ptr user, const std::string& new_name);
 
@@ -40,6 +42,10 @@ public:
 private:
     std::map<const int, user_ptr> m_fd_to_user;
     std::map<std::string, user_ptr> m_name_to_user;
+
+    // change name locks and calls to find, that locks the mutex too
+    // so recursive mutex is necessary
+    std::recursive_mutex m_lock;
 };
 
 } // namespace ilrd

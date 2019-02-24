@@ -19,6 +19,8 @@ namespace ilrd {
 //------------------------------------------------------------------------------
 const std::string Message::key("/say");
 const std::string ChangeName::key("/name");
+const std::string List::key("/list");
+const std::string Whisper::key("/whisper");
 
 //------------------------------------------------------------------------------
 Command::Command(CommandParams&& params)
@@ -94,14 +96,13 @@ void ChangeName::execute()
         "changing name from " + m_params.user->get_name() + " to " +
             m_params.args);
 
-    auto user = m_params.list.find(m_params.args);
-    if (user) {
-        LOG(DEBUG, "Name " + m_params.args + " is taken");
-        m_params.user->get_socket().send("Name " + m_params.args + " is taken");
-        return;
-    }
-
     m_params.list.change_name(m_params.user, m_params.args);
+    if (m_params.user->get_name() != m_params.args) {
+        // failed to change the name
+        std::string str("Name " + m_params.args + " is taken");
+        LOG(DEBUG, str);
+        m_params.user->get_socket().send(str);
+    }
 }
 
 //------------------------------------------------------------------------------

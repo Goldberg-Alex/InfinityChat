@@ -74,6 +74,7 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
+    static const std::string key;
 
 private:
     List(std::shared_ptr<User> user, const UserList& list);
@@ -88,6 +89,7 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
+    static const std::string key;
 
 private:
     Whisper(std::shared_ptr<User> user, std::string name, std::string msg);
