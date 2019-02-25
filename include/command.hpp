@@ -5,6 +5,8 @@
 #include <string> // string
 #include <vector>
 
+#include "logger.hpp"          //Logger
+#include "epoll.hpp"
 #include "user.hpp"
 #include "user_list.hpp"
 
@@ -16,6 +18,7 @@ struct CommandParams {
     std::string args;
     std::shared_ptr<User> user;
     UserList& list;
+    Epoll& epoll;
 };
 //------------------------------------------------------------------------------
 class Command {
@@ -36,12 +39,28 @@ public:
     static std::vector<std::string> s_command_list;
     static void init_command_list();
 
+    template <typename T>
+    static std::unique_ptr<Command> create(CommandParams&& params);
+
 protected:
     CommandParams m_params;
 
 private:
     static size_t push_get_index(std::string&& str);
 };
+
+template <typename T>
+std::unique_ptr<Command> Command::create(CommandParams&& params)
+{
+    try {
+        std::unique_ptr<Command> command(
+            new T(std::forward<CommandParams>(params)));
+        return command;
+    } catch (std::bad_alloc& e) {
+        LOG(ERROR, "failed to create command");
+        throw;
+    }
+}
 
 //------------------------------------------------------------------------------
 class Message : public Command {
@@ -50,10 +69,10 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> create(CommandParams&& params);
     static size_t key;
 
 private:
+    friend Command;
     Message(CommandParams&& params);
 
     void single_message(const Socket& socket);
@@ -66,10 +85,10 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> create(CommandParams&& params);
     static size_t key;
 
 private:
+    friend Command;
     ChangeName(CommandParams&& params);
 };
 
@@ -80,10 +99,10 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> create(CommandParams&& params);
     static size_t key;
 
 private:
+    friend Command;
     List(CommandParams&& params);
 };
 
@@ -94,10 +113,10 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> create(CommandParams&& params);
     static size_t key;
 
 private:
+    friend Command;
     Whisper(CommandParams&& params);
 
     std::string m_name;
@@ -110,10 +129,10 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> create(CommandParams&& params);
     static size_t key;
 
 private:
+    friend Command;
     Help(CommandParams&& params);
 };
 
@@ -124,10 +143,10 @@ public:
 
     void execute() override;
 
-    static std::unique_ptr<Command> create(CommandParams&& params);
     static size_t key;
 
 private:
+    friend Command;
     Quit(CommandParams&& params);
 };
 

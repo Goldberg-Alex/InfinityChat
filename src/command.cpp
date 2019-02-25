@@ -62,18 +62,6 @@ Message::Message(CommandParams&& params)
     : Command(std::forward<CommandParams>(params))
 {}
 
-std::unique_ptr<Command> Message::create(CommandParams&& params)
-{
-    try {
-        std::unique_ptr<Command> message(
-            new Message(std::forward<CommandParams>(params)));
-        return message;
-    } catch (std::bad_alloc& e) {
-        LOG(ERROR, "failed to create Message");
-        throw;
-    }
-}
-
 void Message::execute()
 {
     LOG(DEBUG, "sending message: " + m_params.args);
@@ -93,18 +81,6 @@ void Message::execute()
 ChangeName::ChangeName(CommandParams&& params)
     : Command(std::forward<CommandParams>(params))
 {}
-
-std::unique_ptr<Command> ChangeName::create(CommandParams&& params)
-{
-    try {
-        std::unique_ptr<Command> new_name(
-            new ChangeName(std::forward<CommandParams>(params)));
-        return new_name;
-    } catch (std::bad_alloc& e) {
-        LOG(ERROR, "failed to create ChangeName");
-        throw;
-    }
-}
 
 void ChangeName::execute()
 {
@@ -126,18 +102,6 @@ List::List(CommandParams&& params)
     : Command(std::forward<CommandParams>(params))
 {}
 
-std::unique_ptr<Command> List::create(CommandParams&& params)
-{
-    try {
-        std::unique_ptr<Command> list(
-            new List(std::forward<CommandParams>(params)));
-        return list;
-    } catch (std::bad_alloc& e) {
-        LOG(ERROR, "failed to create list");
-        throw;
-    }
-}
-
 void List::execute()
 {
     LOG(DEBUG, "sending list");
@@ -156,18 +120,6 @@ void List::execute()
 Whisper::Whisper(CommandParams&& params)
     : Command(std::forward<CommandParams>(params))
 {}
-
-std::unique_ptr<Command> Whisper::create(CommandParams&& params)
-{
-    try {
-        std::unique_ptr<Command> list(
-            new Whisper(std::forward<CommandParams>(params)));
-        return list;
-    } catch (std::bad_alloc& e) {
-        LOG(ERROR, "failed to create whisper");
-        throw;
-    }
-}
 
 void Whisper::execute()
 {
@@ -194,18 +146,6 @@ Help::Help(CommandParams&& params)
     : Command(std::forward<CommandParams>(params))
 {}
 
-std::unique_ptr<Command> Help::create(CommandParams&& params)
-{
-    try {
-        std::unique_ptr<Command> help(
-            new Help(std::forward<CommandParams>(params)));
-        return help;
-    } catch (std::bad_alloc& e) {
-        LOG(ERROR, "failed to create help");
-        throw;
-    }
-}
-
 void Help::execute()
 {
     LOG(DEBUG, "sending help");
@@ -224,22 +164,11 @@ Quit::Quit(CommandParams&& params)
     : Command(std::forward<CommandParams>(params))
 {}
 
-std::unique_ptr<Command> Quit::create(CommandParams&& params)
-{
-    try {
-        std::unique_ptr<Command> quit(
-            new Quit(std::forward<CommandParams>(params)));
-        return quit;
-    } catch (std::bad_alloc& e) {
-        LOG(ERROR, "failed to create quit");
-        throw;
-    }
-}
-
 void Quit::execute()
 {
     LOG(DEBUG, "Removing user from the list");
 
+    m_params.epoll.remove(m_params.user->get_fd());
     m_params.list.remove(m_params.user->get_fd());
 }
 

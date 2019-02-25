@@ -63,12 +63,12 @@ int main()
 
     Factory<Command, std::string, CommandParams> factory;
 
-    factory.add(Command::s_command_list[Message::key], &Message::create);
-    factory.add(Command::s_command_list[ChangeName::key], &ChangeName::create);
-    factory.add(Command::s_command_list[List::key], &List::create);
-    factory.add(Command::s_command_list[Whisper::key], &Whisper::create);
-    factory.add(Command::s_command_list[Help::key], &Help::create);
-    factory.add(Command::s_command_list[Quit::key], &Quit::create);
+    factory.add(Command::s_command_list[Message::key], &Command::create<Message>);
+    factory.add(Command::s_command_list[ChangeName::key], &Command::create<ChangeName>);
+    factory.add(Command::s_command_list[List::key], &Command::create<List>);
+    factory.add(Command::s_command_list[Whisper::key], &Command::create<Whisper>);
+    factory.add(Command::s_command_list[Help::key], &Command::create<Help>);
+    factory.add(Command::s_command_list[Quit::key], &Command::create<Quit>);
 
     // add the rest of the tasks in the same way
 
@@ -95,7 +95,7 @@ int main()
 
                 // client disconnected
                 if (message == "\0") {
-                    // remove user from list
+                    epoll.remove(epoll[i].m_fd);
                     continue;
                 }
 
@@ -109,7 +109,7 @@ int main()
                     args = message.substr(end_of_command + 1);
                 }
 
-                CommandParams params{args, user, user_list};
+                CommandParams params{args, user, user_list, epoll};
 
                 auto command = factory.create(key, std::move(params));
                 command->execute();
