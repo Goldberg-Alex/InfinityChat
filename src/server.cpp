@@ -95,8 +95,7 @@ int main()
 
                 // client disconnected
                 if (message == "\0") {
-                    epoll.remove(epoll[i].m_fd);
-                    continue;
+                    message = "/quit";
                 }
 
                 LOG(DEBUG, "received message: " + message);
