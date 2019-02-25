@@ -7,9 +7,10 @@
 
 // Implementation for Two-Keys Map
 #include <stdexcept> // std::logic_error
+#
 
-#include "user_list.hpp"
 #include "logger.hpp"
+#include "user_list.hpp"
 
 namespace ilrd {
 UserList::UserList() : m_fd_to_user(), m_name_to_user()
@@ -91,16 +92,16 @@ void UserList::change_name(user_ptr user, const std::string& new_name)
 {
     ScopeLock<std::recursive_mutex> lock(m_lock);
 
-    if (find(new_name)) {
-        // new_name is taken, return
+    if (find(new_name) || (std::string::npos != new_name.find_first_of(' '))) {
+
+        // new_name is taken or invalid, return
         return;
     }
 
     std::string old_name(user->get_name());
-    
+
     try {
-        m_name_to_user.insert(
-            std::pair<std::string, user_ptr>(new_name, user));
+        m_name_to_user.insert(std::pair<std::string, user_ptr>(new_name, user));
     } catch (const std::exception& e) {
         LOG(ERROR, "failed to change name");
         throw;

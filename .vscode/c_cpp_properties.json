@@ -8,7 +8,8 @@
                 "~/project",
                 "~/include",
                 "~/git/project/include",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "/usr/include"
             ]
         }
     ],

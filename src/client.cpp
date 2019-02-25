@@ -38,30 +38,25 @@ int main(int argc, char const* argv[])
     Socket socket(Socket::create(ip_address, port));
 
     LOG(INFO, "socket connected");
-    //socket.send("client connected");
 
     Epoll epoll;
     epoll.add(STDIN_FILENO, EPOLLIN);
     epoll.add(socket.get_fd(), EPOLLIN);
 
-    LOG(INFO, "user is up");
+    LOG(INFO, "client is ready");
 
     std::string msg;
-    
+
     bool stop(false);
     while (!stop) {
 
         int num_events = epoll.wait(-1);
         LOG(DEBUG, "exit at epoll wait");
+
         for (int i = 0; i < num_events; i++) {
             if (STDIN_FILENO == epoll[i].m_fd) {
+
                 getline(std::cin, msg);
-                
-                if (msg == "/quit") {
-                    stop = true;
-                    LOG(INFO, "user is out");
-                    break;
-                }
 
                 if (msg[0] != '/') {
                     msg = "/say " + msg;
@@ -69,18 +64,28 @@ int main(int argc, char const* argv[])
 
                 socket.send(msg);
                 LOG(DEBUG, "Message sent: " + msg);
-                
+                if (msg == "/quit") {
+                    stop = true;
+                    LOG(INFO, "user is out");
+                    break;
+                }
+
             } else if (socket.get_fd() == epoll[i].m_fd) {
                 msg = socket.receive();
                 LOG(DEBUG, "Message received: " + msg);
                 if (msg.size()) {
                     std::cout << msg << '\n';
+                } else {
+                    stop = true;
+                    LOG(INFO, "server disconnected");
+                    std::cout << "server disconnected" << '\n';
+                    break;
                 }
             }
         }
     }
 
-    LOG(INFO, "chat is down");
+    LOG(INFO, "client closing");
     return 0;
 }
 
