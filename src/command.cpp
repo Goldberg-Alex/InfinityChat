@@ -126,19 +126,20 @@ void Whisper::execute()
     LOG(DEBUG, "sending whisper: " + m_params.args);
 
     size_t name_index = m_params.args.find_first_of(" ");
-    std::string name(m_params.args.substr(0, name_index));
-    std::string whisper(m_params.args.substr(name_index));
+    std::shared_ptr<ilrd::User> callee;
 
-    std::string msg("(whisper)" + m_params.user->get_name() + ": " +
-                    whisper);
+    if (std::string::npos == name_index ||
+        !(callee = m_params.list.find(m_params.args.substr(0, name_index)))) {
 
-    auto callee = m_params.list.find(name);
-    if (!callee) {
-        LOG(DEBUG, "no user founded with a name " + name);
-        m_params.user->get_socket().send("no user founded with a name " + name);
+        LOG(DEBUG, "no user found for whisper");
+        m_params.user->get_socket().send("no user found for whisper");
+        return;
     }
 
-    callee->get_socket().send(msg);
+    std::string whisper(m_params.args.substr(name_index + 1));
+
+    callee->get_socket().send("(whisper)" + m_params.user->get_name() + ": " +
+                              whisper);
 }
 
 //------------------------------------------------------------------------------
@@ -151,10 +152,9 @@ void Help::execute()
     LOG(DEBUG, "sending help");
     std::string msg("Commands:\n");
 
-    for(auto& i : Command::s_command_list) {
+    for (auto& i : Command::s_command_list) {
         msg += i + " ";
     }
-    
 
     m_params.user->get_socket().send(msg);
 }

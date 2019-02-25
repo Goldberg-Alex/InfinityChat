@@ -21,21 +21,32 @@ int main(int argc, char const* argv[])
     // this is just to init the logger to the correct file
     Handleton<Logger>::get_instance("client_log.txt");
 
-    // if (argc < 2) {
-    //     std::string str("not enough arguments to program");
-    //     LOG(ERROR, str);
-    //     throw std::runtime_error(str);
-    // }
+    if (argc < 2) {
+        std::string str("Not enough arguments to program.\n");
+        LOG(ERROR, str);
+        std::cout << str << " Expected: "<< argv[0] <<" ip port" << '\n';
+        return (1);
+    }
 
-    // std::string ip_address(argv[1]);
-    // std::string port(argv[2]);
+    std::string ip_address(argv[1]);
+    std::string port(argv[2]);
 
     // Alex computer: 18
     // Evgeny computer: 21
-    std::string ip_address("10.3.0.21");
-    std::string port("10000");
+    // std::string ip_address("10.3.0.21");
+    // std::string port("10000");
+    Socket socket (-1);
+try
+{
+    socket = Socket::create(ip_address, port);
+}
+catch(const std::exception& e)
+{
+    std::cout << "Error connecting to server." << '\n';
 
-    Socket socket(Socket::create(ip_address, port));
+    return (1);
+}
+
 
     LOG(INFO, "socket connected");
 
@@ -46,6 +57,8 @@ int main(int argc, char const* argv[])
     LOG(INFO, "client is ready");
 
     std::string msg;
+    
+    socket.send("/help");
 
     bool stop(false);
     while (!stop) {

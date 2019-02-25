@@ -6,10 +6,11 @@
 //-----------------------------------------
 
 // this is the main server implementation
-#include <cctype>   //std::isspace
-#include <iostream> //std::cout
-#include <memory>   //std::make_shared
-#include <unistd.h> //STDIN_FILENO
+#include <algorithm> //std::find
+#include <cctype>    //std::isspace
+#include <iostream>  //std::cout
+#include <memory>    //std::make_shared
+#include <unistd.h>  //STDIN_FILENO
 
 #include "command.hpp"         //commands
 #include "config.hpp"          //TCP_LISTEN_PORT
@@ -31,7 +32,9 @@ void add_user(Epoll& epoll, UserList& user_list, SocketListener& listener)
     LOG(INFO, "new user connected");
     Socket socket = listener.connect();
     auto user = std::make_shared<User>(std::move(socket));
+    
     std::cout << user->get_socket().get_fd() << std::endl;
+
     user->get_socket().send("server connected");
     epoll.add(user->get_socket().get_fd(), EPOLLIN);
     user_list.insert(user);
@@ -63,10 +66,13 @@ int main()
 
     Factory<Command, std::string, CommandParams> factory;
 
-    factory.add(Command::s_command_list[Message::key], &Command::create<Message>);
-    factory.add(Command::s_command_list[ChangeName::key], &Command::create<ChangeName>);
+    factory.add(Command::s_command_list[Message::key],
+                &Command::create<Message>);
+    factory.add(Command::s_command_list[ChangeName::key],
+                &Command::create<ChangeName>);
     factory.add(Command::s_command_list[List::key], &Command::create<List>);
-    factory.add(Command::s_command_list[Whisper::key], &Command::create<Whisper>);
+    factory.add(Command::s_command_list[Whisper::key],
+                &Command::create<Whisper>);
     factory.add(Command::s_command_list[Help::key], &Command::create<Help>);
     factory.add(Command::s_command_list[Quit::key], &Command::create<Quit>);
 
@@ -95,7 +101,7 @@ int main()
 
                 // client disconnected
                 if (message == "\0") {
-                    message = "/quit";
+                    message = Command::s_command_list[Quit::key];
                 }
 
                 LOG(DEBUG, "received message: " + message);
@@ -106,6 +112,14 @@ int main()
                 std::string args;
                 if (end_of_command < message.size()) {
                     args = message.substr(end_of_command + 1);
+                }
+
+                if (Command::s_command_list.end() ==
+                    std::find(Command::s_command_list.begin(),
+                              Command::s_command_list.end(),
+                              key)) {
+                    args = user->get_name() + ' ' + key + " command not found";
+                    key = Command::s_command_list[Whisper::key];
                 }
 
                 CommandParams params{args, user, user_list, epoll};
