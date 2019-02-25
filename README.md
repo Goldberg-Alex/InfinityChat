@@ -1,7 +1,9 @@
 # InfinityChat
 Version 1.0
 
+<b>
 Documentation:
+</b>
 
 server usage: 
 Just run it.
