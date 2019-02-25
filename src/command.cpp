@@ -17,15 +17,34 @@
 namespace ilrd {
 
 //------------------------------------------------------------------------------
-const std::string Message::key("/say");
-const std::string ChangeName::key("/name");
-const std::string List::key("/list");
-const std::string Whisper::key("/whisper");
+size_t Message::key(0);
+size_t ChangeName::key(0);
+size_t List::key(0);
+size_t Whisper::key(0);
+size_t Help::key(0);
+size_t Quit::key(0);
+std::vector<std::string> Command::s_command_list;
 
 //------------------------------------------------------------------------------
 Command::Command(CommandParams&& params)
     : m_params(std::forward<CommandParams>(params))
 {}
+
+void Command::init_command_list()
+{
+    Message::key = push_get_index("/say");
+    ChangeName::key = push_get_index("/name");
+    List::key = push_get_index("/list");
+    Whisper::key = push_get_index("/whisper");
+    Help::key = push_get_index("/help");
+    Quit::key = push_get_index("/quit");
+}
+
+size_t Command::push_get_index(std::string&& str)
+{
+    s_command_list.push_back(std::move(str));
+    return (s_command_list.size() - 1);
+}
 
 const std::string& Command::get_args() const
 {
@@ -57,15 +76,13 @@ std::unique_ptr<Command> Message::create(CommandParams&& params)
 
 void Message::execute()
 {
-    LOG(DEBUG, "sending message: " + Command::m_params.args);
-    std::string msg(Command::m_params.user->get_name() + ": " +
-                    Command::m_params.args);
+    LOG(DEBUG, "sending message: " + m_params.args);
+    std::string msg(m_params.user->get_name() + ": " + m_params.args);
 
-    for (auto&& iter = Command::m_params.list.begin();
-         iter != Command::m_params.list.end();
+    for (auto&& iter = m_params.list.begin(); iter != m_params.list.end();
          ++iter) {
 
-        if (iter->second->get_fd() == Command::m_params.user->get_fd()) {
+        if (iter->second->get_fd() == m_params.user->get_fd()) {
             continue;
         }
 
@@ -105,24 +122,125 @@ void ChangeName::execute()
 }
 
 //------------------------------------------------------------------------------
-// List::List(std::shared_ptr<User> user, const UserList& list)
-//     : Command(user, ""), m_list(list)
-// {}
+List::List(CommandParams&& params)
+    : Command(std::forward<CommandParams>(params))
+{}
 
-// std::unique_ptr<Command> List::create(CommandParams&& params)
-// {
-//     std::unique_ptr<Command> list(new List(params.user, params.list));
-//     if (!list) {
-//         LOG(ERROR, "failed to create List");
-//         throw std::bad_alloc();
-//     }
+std::unique_ptr<Command> List::create(CommandParams&& params)
+{
+    try {
+        std::unique_ptr<Command> list(
+            new List(std::forward<CommandParams>(params)));
+        return list;
+    } catch (std::bad_alloc& e) {
+        LOG(ERROR, "failed to create list");
+        throw;
+    }
+}
 
-//     return list;
-// }
+void List::execute()
+{
+    LOG(DEBUG, "sending list");
+    std::string msg("Name list:\n");
 
-// void List::execute()
-// {
-//     // std::string msg(m_user);
-// }
+    for (auto&& iter = m_params.list.begin(); iter != m_params.list.end();
+         ++iter) {
+
+        msg += iter->second->get_name() + "\n";
+    }
+
+    m_params.user->get_socket().send(msg);
+}
+
+//------------------------------------------------------------------------------
+Whisper::Whisper(CommandParams&& params)
+    : Command(std::forward<CommandParams>(params))
+{}
+
+std::unique_ptr<Command> Whisper::create(CommandParams&& params)
+{
+    try {
+        std::unique_ptr<Command> list(
+            new Whisper(std::forward<CommandParams>(params)));
+        return list;
+    } catch (std::bad_alloc& e) {
+        LOG(ERROR, "failed to create whisper");
+        throw;
+    }
+}
+
+void Whisper::execute()
+{
+    LOG(DEBUG, "sending whisper: " + m_params.args);
+
+    size_t name_index = m_params.args.find_first_of(" ");
+    std::string name(m_params.args.substr(0, name_index));
+    std::string whisper(m_params.args.substr(name_index));
+
+    std::string msg("(whisper)" + m_params.user->get_name() + ": " +
+                    whisper);
+
+    auto callee = m_params.list.find(name);
+    if (!callee) {
+        LOG(DEBUG, "no user founded with a name " + name);
+        m_params.user->get_socket().send("no user founded with a name " + name);
+    }
+
+    callee->get_socket().send(msg);
+}
+
+//------------------------------------------------------------------------------
+Help::Help(CommandParams&& params)
+    : Command(std::forward<CommandParams>(params))
+{}
+
+std::unique_ptr<Command> Help::create(CommandParams&& params)
+{
+    try {
+        std::unique_ptr<Command> help(
+            new Help(std::forward<CommandParams>(params)));
+        return help;
+    } catch (std::bad_alloc& e) {
+        LOG(ERROR, "failed to create help");
+        throw;
+    }
+}
+
+void Help::execute()
+{
+    LOG(DEBUG, "sending help");
+    std::string msg("Commands:\n");
+
+    for(auto& i : Command::s_command_list) {
+        msg += i + " ";
+    }
+    
+
+    m_params.user->get_socket().send(msg);
+}
+
+//------------------------------------------------------------------------------
+Quit::Quit(CommandParams&& params)
+    : Command(std::forward<CommandParams>(params))
+{}
+
+std::unique_ptr<Command> Quit::create(CommandParams&& params)
+{
+    try {
+        std::unique_ptr<Command> quit(
+            new Quit(std::forward<CommandParams>(params)));
+        return quit;
+    } catch (std::bad_alloc& e) {
+        LOG(ERROR, "failed to create quit");
+        throw;
+    }
+}
+
+void Quit::execute()
+{
+    LOG(DEBUG, "Removing user from the list");
+
+    m_params.list.remove(m_params.user->get_fd());
+}
 
 } // namespace ilrd

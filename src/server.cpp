@@ -59,10 +59,16 @@ int main()
     epoll.add(STDIN_FILENO, EPOLLIN);
     epoll.add(listener.get_fd(), EPOLLIN);
 
+    Command::init_command_list();
+
     Factory<Command, std::string, CommandParams> factory;
 
-    factory.add(Message::key, &Message::create);
-    factory.add(ChangeName::key, &ChangeName::create);
+    factory.add(Command::s_command_list[Message::key], &Message::create);
+    factory.add(Command::s_command_list[ChangeName::key], &ChangeName::create);
+    factory.add(Command::s_command_list[List::key], &List::create);
+    factory.add(Command::s_command_list[Whisper::key], &Whisper::create);
+    factory.add(Command::s_command_list[Help::key], &Help::create);
+    factory.add(Command::s_command_list[Quit::key], &Quit::create);
 
     // add the rest of the tasks in the same way
 

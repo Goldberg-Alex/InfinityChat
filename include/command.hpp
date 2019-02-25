@@ -3,6 +3,7 @@
 
 #include <memory> //std::unique_ptr
 #include <string> // string
+#include <vector>
 
 #include "user.hpp"
 #include "user_list.hpp"
@@ -32,8 +33,14 @@ public:
     Command(const Command&) = delete;
     Command& operator=(Command&) = delete;
 
+    static std::vector<std::string> s_command_list;
+    static void init_command_list();
+
 protected:
     CommandParams m_params;
+
+private:
+    static size_t push_get_index(std::string&& str);
 };
 
 //------------------------------------------------------------------------------
@@ -44,7 +51,7 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
-    static const std::string key;
+    static size_t key;
 
 private:
     Message(CommandParams&& params);
@@ -60,7 +67,7 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
-    static const std::string key;
+    static size_t key;
 
 private:
     ChangeName(CommandParams&& params);
@@ -74,11 +81,10 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
-    static const std::string key;
+    static size_t key;
 
 private:
-    List(std::shared_ptr<User> user, const UserList& list);
-    const UserList& m_list;
+    List(CommandParams&& params);
 };
 
 //------------------------------------------------------------------------------
@@ -89,15 +95,42 @@ public:
     void execute() override;
 
     static std::unique_ptr<Command> create(CommandParams&& params);
-    static const std::string key;
+    static size_t key;
 
 private:
-    Whisper(std::shared_ptr<User> user, std::string name, std::string msg);
+    Whisper(CommandParams&& params);
 
     std::string m_name;
 };
 
 //------------------------------------------------------------------------------
+class Help : public Command {
+public:
+    ~Help() override = default;
+
+    void execute() override;
+
+    static std::unique_ptr<Command> create(CommandParams&& params);
+    static size_t key;
+
+private:
+    Help(CommandParams&& params);
+};
+
+//------------------------------------------------------------------------------
+class Quit : public Command {
+public:
+    ~Quit() override = default;
+
+    void execute() override;
+
+    static std::unique_ptr<Command> create(CommandParams&& params);
+    static size_t key;
+
+private:
+    Quit(CommandParams&& params);
+};
+
 } // namespace ilrd
 
 #endif // ILRD_COMMAND_HPP
