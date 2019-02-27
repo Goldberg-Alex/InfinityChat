@@ -14,6 +14,7 @@
 #include <thread>    // std::thread
 #include <unistd.h>  //STDIN_FILENO
 
+#include "config.hpp" //TCP_LISTEN_PORT
 #include "epoll.hpp"  //Epoll
 #include "logger.hpp" //Logger
 #include "socket.hpp" //Socket
@@ -40,10 +41,10 @@ void get_string(std::string& str, int row)
     }
 }
 
-void input_listener(const Socket& socket, int max_rows)
+void input_listener(const Socket& socket, int max_rows, bool& stop)
 {
     std::string str;
-    while (str != "/quit") {
+    while (str != "/quit" && !stop) {
         str.clear();
         get_string(str, max_rows - 1);
 
@@ -54,6 +55,7 @@ void input_listener(const Socket& socket, int max_rows)
         socket.send(str);
         LOG(DEBUG, "Message sent: " + str);
     }
+    stop = true;
 }
 
 int main(int argc, char const* argv[])
@@ -69,7 +71,13 @@ int main(int argc, char const* argv[])
     }
 
     std::string ip_address(argv[1]);
-    std::string port(argv[2]);
+
+    // if no port given, use the default
+
+    std::string port(TCP_LISTEN_PORT);
+    if (argc > 2) {
+        port = argv[2];
+    }
 
     // Alex computer: 18
     // Evgeny computer: 21
@@ -96,14 +104,17 @@ int main(int argc, char const* argv[])
 
     socket.send("/help");
     int max_rows, max_cols;
+
     initscr();
     getmaxyx(stdscr, max_rows, max_cols);
 
-    std::thread th(&input_listener,std::cref(socket), max_rows);
-    std::deque<std::string> dq(max_rows - 3);
-
     bool stop(false);
+    std::thread th(
+        &input_listener, std::cref(socket), max_rows, std::cref(stop));
+
     while (!stop) {
+
+        std::deque<std::string> message_queue(max_rows - 3);
 
         int num_events = epoll.wait(-1);
         LOG(DEBUG, "exit at epoll wait");
@@ -113,11 +124,11 @@ int main(int argc, char const* argv[])
                 msg = socket.receive();
                 LOG(DEBUG, "Message received: " + msg);
                 if (msg.size()) {
-                    dq.pop_front();
-                    dq.push_back(msg);
+                    message_queue.pop_front();
+                    message_queue.push_back(msg);
 
                     int i(0);
-                    for (auto& iter : dq) {
+                    for (auto& iter : message_queue) {
                         move(i, 0);
                         clrtoeol();
                         printw(iter.c_str());
