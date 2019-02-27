@@ -70,9 +70,9 @@ void Message::execute()
     for (auto&& iter = m_params.list.begin(); iter != m_params.list.end();
          ++iter) {
 
-        if (iter->second->get_fd() == m_params.user->get_fd()) {
-            continue;
-        }
+        // if (iter->second->get_fd() == m_params.user->get_fd()) {
+        //     continue;
+        // }
 
         iter->second->get_socket().send(msg);
     }

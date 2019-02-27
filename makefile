@@ -3,7 +3,7 @@ CLIENT = client.out
 
 CXX = clang++
 CXXFLAGS = -std=c++11 -pedantic-errors -Wall -Wextra -Wno-padded -Weffc++ \
--Wno-c++98-compat -g -pthread -I$(HEADERS) 
+-Wno-c++98-compat -g -lpthread -lncurses -I$(HEADERS) 
 DEPENDENCY_OPTIONS = -MM -std=c++11 -I$(HEADERS) 
 
 CPPCHECK = cppcheck 
