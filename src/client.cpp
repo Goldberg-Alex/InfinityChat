@@ -99,7 +99,7 @@ int main(int argc, char const* argv[])
     initscr();
     getmaxyx(stdscr, max_rows, max_cols);
 
-    std::thread th(&input_listener, socket, max_rows);
+    std::thread th(&input_listener,std::cref(socket), max_rows);
     std::deque<std::string> dq(max_rows - 3);
 
     bool stop(false);

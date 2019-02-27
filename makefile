@@ -3,8 +3,9 @@ CLIENT = client.out
 
 CXX = clang++
 CXXFLAGS = -std=c++11 -pedantic-errors -Wall -Wextra -Wno-padded -Weffc++ \
--Wno-c++98-compat -g -lpthread -lncurses -I$(HEADERS) 
+-Wno-c++98-compat -g -I$(HEADERS) 
 DEPENDENCY_OPTIONS = -MM -std=c++11 -I$(HEADERS) 
+LINKERFLAGS = -lpthread -lncurses
 
 CPPCHECK = cppcheck 
 CPPCHECKFLAGS = --enable=all --suppress=missingInclude --quiet --verbose 
@@ -57,12 +58,12 @@ $(TEST_EXEC) : $(TEST_OBJ)
 $(CLIENT) : $(OBJ)
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
 
-	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o, $(OBJ))
+	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)server.o, $(OBJ)) $(LINKERFLAGS)
 
 $(SERVER) : $(OBJ)
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(SRC)
 	
-	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)client.o, $(OBJ))
+	$(CXX) $(CXXFLAGS) -o $@ $(filter-out $(OBJ_DIR)client.o, $(OBJ)) $(LINKERFLAGS)
 
 $(OBJ_DIR)%.o : $(SRC_DIR)%.cpp
 	@mkdir -p $(OBJ_DIR)
