@@ -17,9 +17,11 @@ public:
     int get_cols() const;
 
     void println(const std::string& str, int row = 0, int col = 0);
-    
+
     std::string get_line(int row = 0, int col = 0);
     std::string get_line(const std::string& msg, int row = 0, int col = 0);
+
+    void move(int row = 0, int col = 0);
 
     NCurses(NCurses&&) = default;
     NCurses(const NCurses&) = default;

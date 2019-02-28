@@ -7,40 +7,49 @@
 
 // this is a template for a cpp program
 #include <cctype>    // std::isprint
+#include <chrono>    //std::chrono::system_clock::now()
+#include <ctime>     //std::localtime()
 #include <deque>     //std::dqueue
+#include <iomanip>   //std::put_time()
 #include <iostream>  // cin
 #include <ncurses.h> // tui
+#include <sstream>   //std::stringstream
 #include <string>    // string
 #include <thread>    // std::thread
 #include <unistd.h>  //STDIN_FILENO
 
-#include "config.hpp" //TCP_LISTEN_PORT
+#include "config.hpp"  //TCP_LISTEN_PORT
+#include "epoll.hpp"   //Epoll
+#include "logger.hpp"  //Logger
 #include "ncurses.hpp" // tui RAII
-#include "epoll.hpp"  //Epoll
-#include "logger.hpp" //Logger
-#include "socket.hpp" //Socket
+#include "socket.hpp"  //Socket
 //------------------------------------------------------------------------------
 using namespace ilrd;
 
-void get_string(std::string& str, int row) 
+void push_msg(std::string& msg, std::deque<std::string>& message_queue)
 {
-    char a('0');
-    noecho();
-    move(row - 1,0);
-    clrtoeol();
-    mvprintw(row - 1,0,"MSG: ");
-    while (a != '\n') {
-        a = getch();
-        if (std::isprint(a)) {
-            str += a;
+    auto now = std::time(nullptr);
+
+    std::stringstream time;
+    time << "["<< (std::put_time(std::localtime(&now), "%T")) << "] ";
+    msg = time.str() + msg;
+    int i(0);
+    
+    do {
+        size_t to(0);
+        to = msg.find_first_of("\n");
+        if (to == std::string::npos) {
+            to = msg.size();
         }
-        else if (a == 0x7f && str.size()) {
-            str.pop_back();
-        }
-        clrtoeol();
-        mvprintw(row - 1,0, "%s %s", "MSG: ", str.c_str());
-        refresh();
-    }
+
+        std::string sub_msg(
+            (i++ ? std::string(time.str().size(), ' ') : std::string()) +
+            msg.substr(0, to + 1));
+
+        message_queue.pop_front();
+        message_queue.push_back(sub_msg);
+        msg.erase(0, to + 1);
+    } while (msg.size());
 }
 
 void input_listener(const Socket& socket, NCurses& tui, bool& stop)
@@ -50,6 +59,7 @@ void input_listener(const Socket& socket, NCurses& tui, bool& stop)
         str.clear();
         tui.println("MSG: ", tui.get_rows() - 1);
         str = tui.get_line("MSG: ", tui.get_rows() - 1);
+        
 
         if (str[0] != '/') {
             str = "/say " + str;
@@ -105,15 +115,14 @@ int main(int argc, char const* argv[])
 
     std::string msg;
 
-    //socket.send("/help");
+    // socket.send("/help");
     NCurses tui;
-    
 
     bool stop(false);
     std::thread th(
         &input_listener, std::cref(socket), std::ref(tui), std::ref(stop));
 
-        std::deque<std::string> message_queue(tui.get_rows() - 3);
+    std::deque<std::string> message_queue(tui.get_rows() - 3);
     while (!stop) {
         int num_events = epoll.wait(-1);
         LOG(DEBUG, "exit at epoll wait");
@@ -127,15 +136,16 @@ int main(int argc, char const* argv[])
                     // if (message_queue.size() == max_rows - 3) {
                     //     message_queue.pop_front();
                     // }
-                    message_queue.pop_front();
-                    message_queue.push_back(msg);
+                    push_msg(msg, message_queue);
 
                     int i(0);
                     for (auto& iter : message_queue) {
                         tui.println(iter, i);
                         i += (iter.size() / tui.get_cols()) + 1;
                     }
-                    
+
+                    tui.move(tui.get_rows() - 1, 5);
+
                 } else {
                     stop = true;
                     LOG(INFO, "server disconnected");
