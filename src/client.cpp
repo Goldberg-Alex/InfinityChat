@@ -9,44 +9,47 @@
 #include <cctype>    // std::isprint
 #include <deque>     //std::dqueue
 #include <iostream>  // cin
-#include <ncurses.h> // gui
+#include <ncurses.h> // tui
 #include <string>    // string
 #include <thread>    // std::thread
 #include <unistd.h>  //STDIN_FILENO
 
 #include "config.hpp" //TCP_LISTEN_PORT
+#include "ncurses.hpp" // tui RAII
 #include "epoll.hpp"  //Epoll
 #include "logger.hpp" //Logger
 #include "socket.hpp" //Socket
 //------------------------------------------------------------------------------
 using namespace ilrd;
 
-void get_string(std::string& str, int row)
+void get_string(std::string& str, int row) 
 {
     char a('0');
     noecho();
+    move(row - 1,0);
+    clrtoeol();
+    mvprintw(row - 1,0,"MSG: ");
     while (a != '\n') {
-        clrtoeol();
-        mvprintw(row - 1, 0, "MSG: ");
-
         a = getch();
         if (std::isprint(a)) {
             str += a;
-        } else if (a == 0x7f && str.size()) {
+        }
+        else if (a == 0x7f && str.size()) {
             str.pop_back();
         }
-
-        mvprintw(row - 1, 5, str.c_str());
+        clrtoeol();
+        mvprintw(row - 1,0, "%s %s", "MSG: ", str.c_str());
         refresh();
     }
 }
 
-void input_listener(const Socket& socket, int max_rows, bool& stop)
+void input_listener(const Socket& socket, NCurses& tui, bool& stop)
 {
     std::string str;
     while (str != "/quit" && !stop) {
         str.clear();
-        get_string(str, max_rows - 1);
+        tui.println("MSG: ", tui.get_rows() - 1);
+        str = tui.get_line("MSG: ", tui.get_rows() - 1);
 
         if (str[0] != '/') {
             str = "/say " + str;
@@ -102,20 +105,16 @@ int main(int argc, char const* argv[])
 
     std::string msg;
 
-    socket.send("/help");
-    size_t max_rows, max_cols;
-
-    initscr();
-    getmaxyx(stdscr, max_rows, max_cols);
+    //socket.send("/help");
+    NCurses tui;
+    
 
     bool stop(false);
     std::thread th(
-        &input_listener, std::cref(socket), max_rows, std::ref(stop));
+        &input_listener, std::cref(socket), std::ref(tui), std::ref(stop));
 
+        std::deque<std::string> message_queue(tui.get_rows() - 3);
     while (!stop) {
-
-        std::deque<std::string> message_queue(max_rows - 3);
-
         int num_events = epoll.wait(-1);
         LOG(DEBUG, "exit at epoll wait");
 
@@ -128,18 +127,15 @@ int main(int argc, char const* argv[])
                     // if (message_queue.size() == max_rows - 3) {
                     //     message_queue.pop_front();
                     // }
-
+                    message_queue.pop_front();
                     message_queue.push_back(msg);
 
                     int i(0);
                     for (auto& iter : message_queue) {
-                        move(i, 0);
-                        clrtoeol();
-                        printw(iter.c_str());
-                        i += (iter.size() / max_cols) + 1;
+                        tui.println(iter, i);
+                        i += (iter.size() / tui.get_cols()) + 1;
                     }
-
-                    refresh();
+                    
                 } else {
                     stop = true;
                     LOG(INFO, "server disconnected");
@@ -151,7 +147,6 @@ int main(int argc, char const* argv[])
     }
 
     th.join();
-    endwin();
     LOG(INFO, "client closing");
     return 0;
 }
