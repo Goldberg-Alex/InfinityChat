@@ -46,6 +46,7 @@ std::string NCurses::get_line(const std::string& msg, int row, int col)
         if (std::isprint(c)) {
             str += c;
         } else if (c == 0x7f && str.size()) {
+            // backspace
             str.pop_back();
         }
 
@@ -59,6 +60,11 @@ std::string NCurses::get_line(const std::string& msg, int row, int col)
 std::string NCurses::get_line(int row, int col)
 {
     return get_line("", row, col);
+}
+
+void NCurses::move(int row, int col)
+{
+    ::move(row, col);
 }
 
 } // namespace ilrd
