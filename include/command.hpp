@@ -5,8 +5,8 @@
 #include <string> // string
 #include <vector>
 
-#include "logger.hpp"          //Logger
 #include "epoll.hpp"
+#include "logger.hpp" //Logger
 #include "user.hpp"
 #include "user_list.hpp"
 
@@ -29,7 +29,7 @@ public:
     const std::string& get_args() const;
     const std::shared_ptr<User> get_user() const;
     virtual void execute() = 0;
-
+    void send_global_msg(const std::string& msg);
     Command(Command&&) = default;
     Command& operator=(Command&&) = default;
 

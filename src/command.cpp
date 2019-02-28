@@ -55,7 +55,14 @@ const std::shared_ptr<User> Command::get_user() const
 {
     return (m_params.user);
 }
+void Command::send_global_msg(const std::string& msg)
+{
+    for (auto&& iter = m_params.list.begin(); iter != m_params.list.end();
+         ++iter) {
 
+        iter->second->get_socket().send(msg);
+    }
+}
 //------------------------------------------------------------------------------
 
 Message::Message(CommandParams&& params)
@@ -67,16 +74,9 @@ void Message::execute()
     LOG(DEBUG, "sending message: " + m_params.args);
     std::string msg(m_params.user->get_name() + ": " + m_params.args);
 
-    for (auto&& iter = m_params.list.begin(); iter != m_params.list.end();
-         ++iter) {
-
-        // if (iter->second->get_fd() == m_params.user->get_fd()) {
-        //     continue;
-        // }
-
-        iter->second->get_socket().send(msg);
-    }
+    send_global_msg(msg);
 }
+
 //------------------------------------------------------------------------------
 ChangeName::ChangeName(CommandParams&& params)
     : Command(std::forward<CommandParams>(params))
@@ -88,12 +88,19 @@ void ChangeName::execute()
         "changing name from " + m_params.user->get_name() + " to " +
             m_params.args);
 
+    std::string old_name(m_params.user->get_name());
+
     m_params.list.change_name(m_params.user, m_params.args);
     if (m_params.user->get_name() != m_params.args) {
         // failed to change the name
         std::string str("Name " + m_params.args + " is taken");
         LOG(DEBUG, str);
         m_params.user->get_socket().send(str);
+    } else {
+        std::string msg(old_name + " changed name to " +
+                        m_params.user->get_name());
+
+        send_global_msg(msg);
     }
 }
 
@@ -140,6 +147,9 @@ void Whisper::execute()
 
     callee->get_socket().send("(whisper)" + m_params.user->get_name() + ": " +
                               whisper);
+
+    m_params.user->get_socket().send("(whisper to " + callee->get_name() +
+                                     "): " + whisper);
 }
 
 //------------------------------------------------------------------------------
@@ -167,9 +177,12 @@ Quit::Quit(CommandParams&& params)
 void Quit::execute()
 {
     LOG(DEBUG, "Removing user from the list");
+    std::string msg("user " + m_params.user->get_name() + " disconnected.");
 
     m_params.epoll.remove(m_params.user->get_fd());
     m_params.list.remove(m_params.user->get_fd());
+
+    send_global_msg(msg);
 }
 
 } // namespace ilrd

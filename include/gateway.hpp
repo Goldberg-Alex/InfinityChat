@@ -19,17 +19,12 @@ public:
 
     ~ClientGateway();
 
-    virtual std::unique_ptr<RequestEngineRequest<std::string, CommandParams> >
+     std::unique_ptr<RequestEngineRequest<std::string, CommandParams> >
     create() override;
 
 private:
     Socket m_socket;
 };
 
-ClientGateway::ClientGateway()
-{}
-
-ClientGateway::~ClientGateway()
-{}
 } // namespace ilrd
 #endif // ILRD_GATEWAY_HPP
