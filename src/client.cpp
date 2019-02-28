@@ -144,7 +144,7 @@ int main(int argc, char const* argv[])
                         i += (iter.size() / tui.get_cols()) + 1;
                     }
 
-                    tui.move(tui.get_rows() - 1, 5);
+                    tui.println("", tui.get_rows() - 1, 5);
 
                 } else {
                     stop = true;
