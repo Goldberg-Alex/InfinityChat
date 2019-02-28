@@ -23,16 +23,12 @@
 using namespace ilrd;
 
 //------------------------------------------------------------------------------
-void init_server()
-{}
-
-//------------------------------------------------------------------------------
 void add_user(Epoll& epoll, UserList& user_list, SocketListener& listener)
 {
     LOG(INFO, "new user connected");
     Socket socket = listener.connect();
     auto user = std::make_shared<User>(std::move(socket));
-    
+
     std::cout << user->get_socket().get_fd() << std::endl;
 
     user->get_socket().send("server connected");

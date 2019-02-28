@@ -19,6 +19,9 @@ const char TCP_LISTEN_PORT[] = "10000";
 // number of allowed pending requests to the tcp socket we're listening to
 const int TCP_BACKLOG_SIZE = 100;
 
+// port number for UDP broadcasts to reply with server ip
+const char UDP_LISTEN_PORT[] = "11000";
+
 // Logger logging level. DEBUG > INFO > ERROR. individual logs lower than the
 // log level will not be written
 enum log_level { ERROR = 0, INFO = 1, DEBUG = 2 };
