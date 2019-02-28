@@ -139,7 +139,7 @@ int main(int argc, char const* argv[])
                 } else {
                     stop = true;
                     LOG(INFO, "server disconnected");
-                    std::cout << "server disconnected" << '\n';
+                    tui.println("server disconnected", tui.get_rows() - 1);
                     break;
                 }
             }
