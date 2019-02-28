@@ -88,7 +88,7 @@ int main()
                 stop = true;
                 break;
             } else if (listener.get_fd() == epoll[i].m_fd) {
-                
+
                 add_user(epoll, user_list, listener);
 
             } else if (epoll[i].m_event_type == EPOLLIN) {

@@ -177,12 +177,12 @@ Quit::Quit(CommandParams&& params)
 void Quit::execute()
 {
     LOG(DEBUG, "Removing user from the list");
-    std::string msg("user " + m_params.user->get_name() + " disconnected.");
+    // std::string msg("user " + m_params.user->get_name() + " disconnected.");
 
     m_params.epoll.remove(m_params.user->get_fd());
     m_params.list.remove(m_params.user->get_fd());
 
-    send_global_msg(msg);
+    // send_global_msg(msg);
 }
 
 } // namespace ilrd
