@@ -103,14 +103,14 @@ int main(int argc, char const* argv[])
     std::string msg;
 
     socket.send("/help");
-    int max_rows, max_cols;
+    size_t max_rows, max_cols;
 
     initscr();
     getmaxyx(stdscr, max_rows, max_cols);
 
     bool stop(false);
     std::thread th(
-        &input_listener, std::cref(socket), max_rows, std::cref(stop));
+        &input_listener, std::cref(socket), max_rows, std::ref(stop));
 
     while (!stop) {
 
@@ -123,8 +123,12 @@ int main(int argc, char const* argv[])
             if (socket.get_fd() == epoll[i].m_fd) {
                 msg = socket.receive();
                 LOG(DEBUG, "Message received: " + msg);
+
                 if (msg.size()) {
-                    message_queue.pop_front();
+                    // if (message_queue.size() == max_rows - 3) {
+                    //     message_queue.pop_front();
+                    // }
+
                     message_queue.push_back(msg);
 
                     int i(0);
