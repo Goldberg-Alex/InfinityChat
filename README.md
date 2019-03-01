@@ -18,7 +18,7 @@ run the client with ip address of the server.
 
 the commands are:
 
-/say message - sends message to  all connected users.
+/say message - sends message to  all connected users.</br>
 message - same as "/say message"
 
 /name new_name - Changed user name to new_name. Must not contain spaces.</br>
